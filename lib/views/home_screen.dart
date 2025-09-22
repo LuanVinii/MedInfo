@@ -25,7 +25,7 @@ class HomeView extends StatelessWidget {
     return Scaffold(
       body: Stack(
         children: [
-          Container(), // background virá depois
+          const Background(),
           SafeArea(
             child: Column(
               children: const [
@@ -42,6 +42,20 @@ class HomeView extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class Background extends StatelessWidget {
+  const Background({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox.expand(
+      child: Image.asset(
+        'assets/images/background.png',
+        fit: BoxFit.cover,
       ),
     );
   }
