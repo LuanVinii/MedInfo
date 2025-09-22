@@ -254,3 +254,63 @@ class FooterItem extends StatelessWidget {
     );
   }
 }
+
+class AntigripaisPage extends StatelessWidget {
+  const AntigripaisPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Antigripais')),
+      body: const Center(child: Text('Página de Antigripais')),
+    );
+  }
+}
+
+class AnalgesicoPage extends StatelessWidget {
+  const AnalgesicoPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Analgésico')),
+      body: const Center(child: Text('Página de Analgésico')),
+    );
+  }
+}
+
+class AntibioticoPage extends StatelessWidget {
+  const AntibioticoPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Antibiótico')),
+      body: const Center(child: Text('Página de Antibiótico')),
+    );
+  }
+}
+
+class CategoriaPage extends StatelessWidget {
+  const CategoriaPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Categoria')),
+      body: const Center(child: Text('Página de Categoria')),
+    );
+  }
+}
+
+class AjustePage extends StatelessWidget {
+  const AjustePage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Ajuste')),
+      body: const Center(child: Text('Página de Ajustes')),
+    );
+  }
+}
