@@ -115,3 +115,25 @@ class BlueSection extends StatelessWidget {
     );
   }
 }
+
+class SearchInput extends StatelessWidget {
+  const SearchInput({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return TextField(
+      decoration: InputDecoration(
+        hintText: 'Pesquisar...',
+        prefixIcon: const Icon(Icons.search, color: Colors.black),
+        hintStyle: const TextStyle(color: Colors.black),
+        filled: true,
+        fillColor: Colors.white,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(20),
+          borderSide: BorderSide.none,
+        ),
+      ),
+      style: const TextStyle(color: Colors.black),
+    );
+  }
+}
