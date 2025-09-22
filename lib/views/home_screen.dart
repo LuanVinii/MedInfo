@@ -35,6 +35,7 @@ class HomeView extends StatelessWidget {
                       children: [
                         TopBar(),
                         SizedBox(height: 20),
+                        BlueSection(),
                       ],
                     ),
                   ),
@@ -80,6 +81,34 @@ class TopBar extends StatelessWidget {
           IconButton(
             onPressed: () {},
             icon: const Icon(Icons.person, color: Colors.black, size: 30),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class BlueSection extends StatelessWidget {
+  const BlueSection({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: const BoxDecoration(
+        color: Color(0xFF023542),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const SearchInput(),
+          const SizedBox(height: 20),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: const [
+              // botões virão no próximo commit
+            ],
           ),
         ],
       ),
