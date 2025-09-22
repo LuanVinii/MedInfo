@@ -1,183 +1,161 @@
 import 'package:flutter/material.dart';
+import 'package:medinfo/views/home_screen.dart';
 import '../models/categoria.dart';
 
-class CategoriaScreen extends StatelessWidget {
-  // REMOVER O 'const' DO CONSTRUTOR
-  CategoriaScreen({Key? key}) : super(key: key);
+void main() {
+  runApp(const MyApp());
+}
 
-  // Lista de categorias (agora funciona porque o construtor não é mais const)
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'CategoriaView',
+      home: CategoriaScreen(),
+    );
+  }
+}
+
+class CategoriaScreen extends StatelessWidget {
+  CategoriaScreen({super.key});
+
   final List<Categoria> _categorias = [
     Categoria(
       id: 1,
       nome: 'Antigripais',
-      descricao: 'Alívio de sintomas de gripeR',
-      icone: 'sick_outlined',
+      descricao: 'Alívio de sintomas de gripe',
+      icone: 'antigripais',
     ),
     Categoria(
       id: 2,
-      nome: 'Analgésicos',
+      nome: 'Analgésico',
       descricao: 'Para dor e desconforto',
-      icone: 'medication_outlined',
+      icone: 'analgesico',
     ),
     Categoria(
       id: 3,
       nome: 'Antialérgicos',
       descricao: 'Controle de reações alérgicas',
-      icone: 'nature_outlined',
+      icone: 'antialergicos',
     ),
     Categoria(
       id: 4,
-      nome: 'Anti-inflamatórios',
+      nome: 'Anti-inflamatório',
       descricao: 'Reduz inflamação e dor',
-      icone: 'local_fire_department_outlined',
+      icone: 'antiinflamatorio',
     ),
     Categoria(
       id: 5,
-      nome: 'Antibióticos',
+      nome: 'Antibiótico',
       descricao: 'Combate infecções',
-      icone: 'health_and_safety_outlined',
+      icone: 'antibiotico',
     ),
   ];
 
-  // Método para converter string em IconData
   IconData _getIconData(String iconName) {
     switch (iconName) {
-      case 'sick_outlined':
-        return Icons.sick_outlined;
-      case 'medication_outlined':
-        return Icons.medication_outlined;
-      case 'nature_outlined':
-        return Icons.nature_outlined;
-      case 'local_fire_department_outlined':
-        return Icons.local_fire_department_outlined;
-      case 'health_and_safety_outlined':
-        return Icons.health_and_safety_outlined;
+      case 'antigripais':
+        return Icons.sick; // gripe/doença
+      case 'analgesico':
+        return Icons.healing; // cura/remédio
+      case 'antialergicos':
+        return Icons.local_hospital; // hospital/alergia
+      case 'antiinflamatorio':
+        return Icons.medical_services; // inflamação/serviço médico
+      case 'antibiotico':
+        return Icons.vaccines; // antibiótico/vacina
       default:
-        return Icons.medication_outlined;
+        return Icons.medical_services; // padrão
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.transparent,
-      body: CustomScrollView(
-        slivers: [
-          SliverAppBar(
-            backgroundColor: Colors.transparent,
-            expandedHeight: 120.0,
-            flexibleSpace: FlexibleSpaceBar(
-              title: const Text(
-                'MedInfo',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 24,
-                ),
-              ),
-              centerTitle: true,
-              background: Container(
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [Colors.blue, Colors.purple],
+      body: Stack(
+        children: [
+          const Background(),
+          SafeArea(
+            child: Column(
+              children: [
+                const TopBar(),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(16),
+                  color: const Color(0xFF023542),
+                  child: const Center(
+                    child: Text(
+                      "Categoria",
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
                   ),
                 ),
-              ),
-            ),
-          ),
-
-          const SliverToBoxAdapter(
-            child: Padding(
-              padding: EdgeInsets.all(16.0),
-              child: Text(
-                'Categoria',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: _categorias.length,
+                    itemBuilder: (context, index) {
+                      final categoria = _categorias[index];
+                      return Card(
+                        margin: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 8),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 2,
+                        child: ListTile(
+                          leading: CircleAvatar(
+                            backgroundColor: const Color(0xFF023542),
+                            child: Text(
+                              categoria.nome[0],
+                              style: const TextStyle(color: Colors.white),
+                            ),
+                          ),
+                          title: Text(
+                            categoria.nome,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
+                          subtitle: Text(
+                            categoria.descricao,
+                            style: const TextStyle(
+                              color: Colors.black54,
+                              fontSize: 14,
+                            ),
+                          ),
+                          trailing: Icon(
+                            _getIconData(categoria.icone),
+                            color: const Color(0xFF023542),
+                            size: 28,
+                          ),
+                          onTap: () {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                    'Abrindo medicamentos de ${categoria.nome}'),
+                                duration: const Duration(seconds: 1),
+                              ),
+                            );
+                          },
+                        ),
+                      );
+                    },
+                  ),
                 ),
-              ),
-            ),
-          ),
-
-          SliverList(
-            delegate: SliverChildBuilderDelegate(
-              (context, index) {
-                final categoria = _categorias[index];
-                return _buildItemCategoria(categoria, context);
-              },
-              childCount: _categorias.length,
+              ],
             ),
           ),
         ],
       ),
-      
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Início',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.category),
-            label: 'Categoria',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'Ajustes',
-          ),
-        ],
-        currentIndex: 1,
-        onTap: (index) {
-          // Navegação será implementada depois
-        },
-      ),
-    );
-  }
-
-  Widget _buildItemCategoria(Categoria categoria, BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
-      elevation: 2,
-      child: ListTile(
-        leading: CircleAvatar(
-          backgroundColor: Colors.blue.shade100,
-          child: Icon(
-            _getIconData(categoria.icone),
-            color: Colors.blue.shade800,
-          ),
-        ),
-        title: Text(
-          categoria.nome,
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 16,
-          ),
-        ),
-        subtitle: Text(
-          categoria.descricao,
-          style: const TextStyle(
-            color: Colors.grey,
-            fontSize: 14,
-          ),
-        ),
-        trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-        onTap: () {
-          _navegarParaMedicamentos(categoria, context);
-        },
-      ),
-    );
-  }
-
-  void _navegarParaMedicamentos(Categoria categoria, BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Navegar para medicamentos de ${categoria.nome}'),
-        duration: const Duration(seconds: 1),
-      ),
+      bottomNavigationBar: const Footer(),
     );
   }
 }

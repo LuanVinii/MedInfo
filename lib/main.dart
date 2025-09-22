@@ -1,32 +1,4 @@
 import 'package:flutter/material.dart';
-<<<<<<< HEAD
-import 'widgets/global_background.dart';
-import 'views/categoria_screen.dart';
-
-void main() {
-  runApp(const MedInfoApp());
-}
-
-class MedInfoApp extends StatelessWidget {
-  const MedInfoApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp( // ← MaterialApp DEVE VIR PRIMEIRO
-      title: 'MedInfo',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-        useMaterial3: true,
-        scaffoldBackgroundColor: Colors.transparent,
-      ),
-      home: GlobalBackground( // ← GlobalBackground DENTRO do home
-        child: CategoriaScreen(),
-      ),
-    );
-  }
-}
-=======
 
 void main() {
   runApp(const MyApp());
@@ -148,4 +120,3 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 }
->>>>>>> 22eff04d4ece71597f84847f0022bf1d1583dba2
