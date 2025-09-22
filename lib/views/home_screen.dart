@@ -106,8 +106,30 @@ class BlueSection extends StatelessWidget {
           const SizedBox(height: 20),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: const [
-              // botões virão no próximo commit
+            children: [
+              Expanded(
+                child: _CustomButton(
+                  icon: Icons.medical_services,
+                  label: 'Antigripais',
+                  onTap: () {},
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: _CustomButton(
+                  icon: Icons.location_on,
+                  label: 'Analgésico',
+                  onTap: () {},
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: _CustomButton(
+                  icon: Icons.category,
+                  label: 'Antibiótico',
+                  onTap: () {},
+                ),
+              ),
             ],
           ),
         ],
@@ -134,6 +156,41 @@ class SearchInput extends StatelessWidget {
         ),
       ),
       style: const TextStyle(color: Colors.black),
+    );
+  }
+}
+
+class _CustomButton extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
+  const _CustomButton(
+      {required this.icon, required this.label, required this.onTap, super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, color: Colors.black),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                label,
+                style: const TextStyle(color: Colors.black),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
