@@ -14,7 +14,6 @@ MedInfo é um aplicativo em Flutter que funciona como uma bula virtual, permitin
 - **Home** → exibe as categorias de medicamentos.
 - **Categoria** → lista as classes de medicamentos (ex: Antigripais, Analgésicos, Anti-inflamatórios etc.)
 - **Medicamento** → detalhes de um medicamento específico (descrição, indicações, contraindicações, modo de uso).
-- **Sobre (opcional)** → informações sobre o app e equipe.
 
 ## ⚠️ Aviso  
 Atualmente, a versão do projeto está só com a estrutura do app.
