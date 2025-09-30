@@ -40,7 +40,6 @@ class HomeView extends StatelessWidget {
                     ),
                   ),
                 ),
-                Footer(),
               ],
             ),
           ),
@@ -191,65 +190,6 @@ class _CustomButton extends StatelessWidget {
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class Footer extends StatelessWidget {
-  const Footer({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 20),
-      decoration: const BoxDecoration(
-        color: Color(0xFF023542),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          FooterItem(
-            icon: Icons.home,
-            label: 'Início',
-            onTap: () {},
-          ),
-          FooterItem(
-            icon: Icons.category,
-            label: 'Categoria',
-            onTap: () {},
-          ),
-          FooterItem(
-            icon: Icons.settings,
-            label: 'Ajuste',
-            onTap: () {},
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class FooterItem extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final VoidCallback onTap;
-
-  const FooterItem(
-      {required this.icon, required this.label, required this.onTap, super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, color: Colors.white, size: 30),
-          const SizedBox(height: 8),
-          Text(label, style: const TextStyle(color: Colors.white, fontSize: 14)),
-        ],
       ),
     );
   }

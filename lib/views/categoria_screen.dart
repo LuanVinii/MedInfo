@@ -155,7 +155,6 @@ class CategoriaScreen extends StatelessWidget {
           ),
         ],
       ),
-      bottomNavigationBar: const Footer(),
     );
   }
 }
