@@ -77,7 +77,7 @@ class TopBar extends StatelessWidget {
             onPressed: () {},
             icon: const Icon(Icons.menu, color: Colors.black, size: 30),
           ),
-          Image.asset('assets/images/LogoMedInfo.png', height: 50),
+          Image.asset('assets/images/logo.png', height: 50),
           IconButton(
             onPressed: () {},
             icon: const Icon(Icons.person, color: Colors.black, size: 30),
@@ -166,7 +166,7 @@ class _CustomButton extends StatelessWidget {
   final VoidCallback onTap;
 
   const _CustomButton(
-      {required this.icon, required this.label, required this.onTap, super.key});
+      {required this.icon, required this.label, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
