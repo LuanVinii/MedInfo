@@ -1,191 +1,67 @@
 import 'package:flutter/material.dart';
+import '../widgets/shared_widgets.dart'; // Importa widgets compartilhados como AppBar e HeaderSection
 
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'HomeView',
-      home: const HomeView(),
-    );
-  }
-}
-
-class HomeView extends StatelessWidget {
+class HomeView extends StatefulWidget {
   const HomeView({super.key});
 
   @override
+  State<HomeView> createState() => _HomeViewState();
+}
+
+class _HomeViewState extends State<HomeView> {
+  // Flag que indica se o usuário já clicou no botão "Entendi"
+  // Serve para mudar o botão para um check verde depois
+  bool _disclaimerAcknowledged = false; 
+
+  // Função chamada quando o usuário aperta "Entendi"
+  void _acknowledgeDisclaimer() {
+    setState(() {
+      _disclaimerAcknowledged = true;
+    });
+    // Aqui depois você pode salvar no SharedPreferences para lembrar entre sessões
+  }
+
+  @override
   Widget build(BuildContext context) {
+    // O Scaffold é o esqueleto da tela, mas com fundo transparente
+    // Para permitir que o widget GlobalBackground apareça atrás
     return Scaffold(
-      body: Stack(
-        children: [
-          const Background(),
-          SafeArea(
-            child: Column(
-              children: const [
-                Expanded(
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        TopBar(),
-                        SizedBox(height: 20),
-                        BlueSection(),
-                      ],
-                    ),
+      backgroundColor: Colors.transparent,
+      body: SafeArea(
+        child: Column(
+          children: [
+            // AppBar reutilizável do projeto
+            const CustomAppBar(),
+
+            // Faixa azul do topo com o título e ícone
+            const HeaderSection(), 
+            
+            // Toda a parte de conteúdo abaixo pode rolar
+            Expanded(
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+
+                  // Coluna principal da Home
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      // Pequeno espaçamento após o header
+                      const SizedBox(height: 10), 
+
+                      // Caixa do aviso ("Atenção!")
+                      DisclaimerBox(
+                        isAcknowledged: _disclaimerAcknowledged,
+                        onAcknowledge: _acknowledgeDisclaimer,
+                      ),
+
+                      const SizedBox(height: 20),
+
+                      // Aqui futuramente entram categorias, medicamentos recentes, etc.
+                      // ...
+                    ],
                   ),
                 ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class Background extends StatelessWidget {
-  const Background({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox.expand(
-      child: Image.asset(
-        'assets/images/background.png',
-        fit: BoxFit.cover,
-      ),
-    );
-  }
-}
-
-class TopBar extends StatelessWidget {
-  const TopBar({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.menu, color: Colors.black, size: 30),
-          ),
-          Image.asset('assets/images/logo.png', height: 50),
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.person, color: Colors.black, size: 30),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class BlueSection extends StatelessWidget {
-  const BlueSection({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(16),
-      decoration: const BoxDecoration(
-        color: Color(0xFF023542),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          const SearchInput(),
-          const SizedBox(height: 20),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: _CustomButton(
-                  icon: Icons.medical_services,
-                  label: 'Antigripais',
-                  onTap: () {},
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: _CustomButton(
-                  icon: Icons.location_on,
-                  label: 'Analgésico',
-                  onTap: () {},
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: _CustomButton(
-                  icon: Icons.category,
-                  label: 'Antibiótico',
-                  onTap: () {},
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class SearchInput extends StatelessWidget {
-  const SearchInput({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return TextField(
-      decoration: InputDecoration(
-        hintText: 'Pesquisar...',
-        prefixIcon: const Icon(Icons.search, color: Colors.black),
-        hintStyle: const TextStyle(color: Colors.black),
-        filled: true,
-        fillColor: Colors.white,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(20),
-          borderSide: BorderSide.none,
-        ),
-      ),
-      style: const TextStyle(color: Colors.black),
-    );
-  }
-}
-
-class _CustomButton extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final VoidCallback onTap;
-
-  const _CustomButton(
-      {required this.icon, required this.label, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Row(
-          children: [
-            Icon(icon, color: Colors.black),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                label,
-                style: const TextStyle(color: Colors.black),
               ),
             ),
           ],
@@ -195,62 +71,135 @@ class _CustomButton extends StatelessWidget {
   }
 }
 
-class AntigripaisPage extends StatelessWidget {
-  const AntigripaisPage({super.key});
+
+/// ----------------------------
+///  WIDGET: Caixa de Aviso
+/// ----------------------------
+///
+/// Widget único que exibe:
+/// - Título "Atenção!"
+/// - Texto explicando que não substitui orientação médica
+/// - Botão para saber mais
+/// - Botão "Entendi" que vira um check verde depois
+///
+class DisclaimerBox extends StatelessWidget {
+  final VoidCallback onAcknowledge; // Função chamada quando clicam no botão
+  final bool isAcknowledged;        // Indica se já marcaram como lido
+
+  const DisclaimerBox({
+    required this.onAcknowledge, 
+    required this.isAcknowledged,
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Antigripais')),
-      body: const Center(child: Text('Página de Antigripais')),
-    );
-  }
-}
+    return Container(
+      // Área da caixa
+      padding: const EdgeInsets.all(20),
 
-class AnalgesicoPage extends StatelessWidget {
-  const AnalgesicoPage({super.key});
+      // Aparência visual do card
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: const [
+          // Sombra suave para destacar do fundo
+          BoxShadow(
+            color: Colors.black12,
+            blurRadius: 10,
+            offset: Offset(0, 5),
+          ),
+        ],
+      ),
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Analgésico')),
-      body: const Center(child: Text('Página de Analgésico')),
-    );
-  }
-}
+      // Conteúdo interno
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
 
-class AntibioticoPage extends StatelessWidget {
-  const AntibioticoPage({super.key});
+          // Título grande da caixa
+          const Text( 
+            "Atenção!",
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF023542),
+            ),
+          ),
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Antibiótico')),
-      body: const Center(child: Text('Página de Antibiótico')),
-    );
-  }
-}
+          const SizedBox(height: 15),
 
-class CategoriaPage extends StatelessWidget {
-  const CategoriaPage({super.key});
+          // Texto explicando a função do app
+          const Text(
+            "As informações apresentadas neste aplicativo são reunidas de fontes públicas da internet e têm apenas o objetivo de organizar dados sobre medicamentos em um só lugar.\n\n"
+            "Elas não substituem consulta médica, diagnóstico profissional ou orientação de um farmacêutico.",
+            style: TextStyle(
+              fontSize: 15,
+              height: 1.4, // Deixa o texto mais confortável de ler
+              color: Colors.black87,
+            ),
+            textAlign: TextAlign.justify,
+          ),
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Categoria')),
-      body: const Center(child: Text('Página de Categoria')),
-    );
-  }
-}
+          const SizedBox(height: 25),
+          
+          // Linha com os dois botões da caixa
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
 
-class AjustePage extends StatelessWidget {
-  const AjustePage({super.key});
+              // Botão "Quero saber mais" (ainda sem lógica)
+              TextButton(
+                onPressed: () {
+                  // Navegação futura para uma tela explicando mais detalhes
+                },
+                child: const Text(
+                  "Quero saber mais", 
+                  style: TextStyle(
+                    color: Color(0xFF023542), 
+                    fontWeight: FontWeight.bold, 
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+              
+              // Botão "Entendi"
+              ElevatedButton(
+                onPressed: isAcknowledged ? null : onAcknowledge, 
+                // Se já clicou antes, o botão fica desativado
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Ajuste')),
-      body: const Center(child: Text('Página de Ajustes')),
+                style: ElevatedButton.styleFrom(
+                  // Cor muda se já foi reconhecido
+                  backgroundColor: isAcknowledged 
+                      ? Colors.green 
+                      : const Color(0xFF023542),
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20, 
+                    vertical: 10,
+                  ),
+                ),
+
+                // Conteúdo do botão
+                child: isAcknowledged
+                    // Se já clicou: aparece só um ícone de check
+                    ? const Icon(Icons.check, size: 24)
+                    // Se ainda não clicou: mostra "Entendi"
+                    : const Text(
+                        "Entendi",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }
