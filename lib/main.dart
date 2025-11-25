@@ -1,8 +1,11 @@
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 // Importa a AppShell, que é a estrutura principal com navegação e layout
 import 'package:medinfo/views/app_shell.dart';
+
+import '/services/medicamento.dart';
 
 Future<void> main() async {
   await dotenv.load(fileName: '.env');
@@ -23,7 +26,7 @@ Future<void> main() async {
   await Supabase.initialize(url: databaseUrl, anonKey: databaseKey);
 
   // Inicia o app e carrega o widget principal
-  runApp(const MyApp());
+  runApp(ProviderScope(child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {
