@@ -3,14 +3,11 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '/models/categoria.dart';
 
 class CategoriaService {
-  static final SupabaseQueryBuilder tabelaPadrao = Supabase.instance.client.from('categories');
-  final SupabaseQueryBuilder tabela;
+  static final SupabaseClient _client = Supabase.instance.client;
 
-  CategoriaService({SupabaseQueryBuilder? tabela}) : tabela = tabela ?? tabelaPadrao;
-
-  Future<List<Categoria>> getAll() async {
-    final response = await tabela.select();
-    return response.map((json) => Categoria.fromJson(json)).toList();
+  Future<List<Categoria>> obterTodas() async {
+    var registros = await _client.from('categories').select();
+    return registros.map((json) => Categoria.fromJson(json)).toList();
   }
 
 }
