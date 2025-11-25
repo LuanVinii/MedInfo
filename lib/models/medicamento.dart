@@ -1,23 +1,45 @@
 class Medicamento {
   final int id;
-  final String nome;                 
-  final List<String> icones;
-  final String imagemReal;           
-  final String indicacao;            
-  final String dosagemRecomendada;   
-  final String precaucoes;    
-  final String efeitosColaterais;       
-  final int categoriaId;             // relacionamento com Categoria
+  final String nome;
+  final int categoriaId;
+  final String formatoId;
+  final int viaAdministracaoId;
+  final int tarjaId;
+  final double precoMedio;
+  final int laboratorioId;
 
   Medicamento({
     required this.id,
     required this.nome,
-    required this.icones,
-    required this.imagemReal,
-    required this.indicacao,
-    required this.dosagemRecomendada,
-    required this.precaucoes,
-    required this.efeitosColaterais,
     required this.categoriaId,
+    required this.formatoId,
+    required this.viaAdministracaoId,
+    required this.tarjaId,
+    required this.precoMedio,
+    required this.laboratorioId
   });
+
+  factory Medicamento.fromJson(Map<String, dynamic> json) {
+    return Medicamento(
+      id: json['id'],
+      nome: json['name'],
+      categoriaId: json['category_id'],
+      formatoId: json['format_id'],
+      viaAdministracaoId: json['admroute_id'],
+      tarjaId: json['labelclass_id'],
+      precoMedio: json['average_price'],
+      laboratorioId: json['laboratory_id']
+    );
+  }
+
+  @override
+  String toString() => "Medicamento { "
+        "id: $id, "
+        "nome: $nome, "
+        "categoriaId: $categoriaId, "
+        "formatoId: $formatoId, "
+        "viaAdministracaoId: $viaAdministracaoId, "
+        "tarjaId: $tarjaId, "
+        "precoMedio: $precoMedio, "
+        "laboratorioId: $laboratorioId }";
 }

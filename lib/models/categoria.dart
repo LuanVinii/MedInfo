@@ -10,4 +10,16 @@ class Categoria {
     required this.descricao,
     required this.icone,
   });
+
+  factory Categoria.fromJson(Map<String, dynamic> json) {
+    return Categoria(
+      id: json['id'],
+      nome: json['name'],
+      descricao: json['description'],
+      icone: ''
+    );
+  }
+
+  @override
+  String toString() => "Categoria { id: $id, nome: $nome, descricao: $descricao }";
 }

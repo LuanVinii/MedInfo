@@ -10,4 +10,16 @@ class Usuario {
     required this.email,
     required this.senha,
   });
+
+  factory Usuario.fromJson(Map<String, dynamic> json) {
+    return Usuario(
+      id: json['id'],
+      nome: json['name'],
+      email: json['email'],
+      senha: json['password'],
+    );
+  }
+
+  @override
+  String toString() => "Usuario { id: $id, nome: $nome, email: $email, senha: $senha }";
 }
