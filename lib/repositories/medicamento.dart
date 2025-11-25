@@ -36,4 +36,9 @@ class MedicamentoRepository {
     return await service.obterPorUsuario(usuario);
   }
 
+  Future<List<Medicamento>> buscarPorTermoNaCategoria(String termo, Categoria categoria) async {
+    List<Medicamento> medicamentos = await buscarPorTermo(termo);
+    return medicamentos.where((medicamento) => medicamento.categoria.id == categoria.id).toList();
+  }
+
 }

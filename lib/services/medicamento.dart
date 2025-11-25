@@ -1,7 +1,7 @@
-import 'package:medinfo/models/categoria.dart';
 import 'package:medinfo/models/usuario.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '/models/categoria.dart';
 import '/models/medicamento.dart';
 
 class MedicamentoService {
@@ -9,8 +9,8 @@ class MedicamentoService {
 
   Future<List<Medicamento>> buscarPorNome(String nome) async {
     var registros = await _client.from('medicines')
-      .select(_MedicamentoQuery.infos)
-      .ilike('name', '%$nome%');
+        .select(_MedicamentoQuery.infos)
+        .ilike('name', '%$nome%');
     return registros.map((objeto) => Medicamento.fromJson(objeto)).toList();
   }
 
