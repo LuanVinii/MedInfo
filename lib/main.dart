@@ -1,8 +1,27 @@
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 // Importa a AppShell, que é a estrutura principal com navegação e layout
-import 'package:medinfo/views/app_shell.dart'; 
+import 'package:medinfo/views/app_shell.dart';
 
-void main() {
+Future<void> main() async {
+  await dotenv.load(fileName: '.env');
+
+  WidgetsFlutterBinding.ensureInitialized();
+
+  String? databaseUrl = dotenv.env['SUPABASE_URL'];
+  String? databaseKey = dotenv.env['SUPABASE_KEY'];
+
+  if (databaseUrl == null) {
+    throw AuthException("Variável \"SUPABASE_URL\" não definida em tempo de execução!");
+  }
+
+  if (databaseKey == null) {
+    throw AuthException("Variável \"SUPABASE_KEY\" não definida em tempo de execução!");
+  }
+
+  await Supabase.initialize(url: databaseUrl, anonKey: databaseKey);
+
   // Inicia o app e carrega o widget principal
   runApp(const MyApp());
 }

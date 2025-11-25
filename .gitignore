@@ -1,4 +1,5 @@
 # Miscellaneous
+**/assets/authentication
 *.class
 *.log
 *.pyc
