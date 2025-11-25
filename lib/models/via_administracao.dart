@@ -1,20 +1,20 @@
 class ViaAdministracao {
   final int id;
-  final String nome;
+  final String descricao;
 
   ViaAdministracao({
     required this.id,
-    required this.nome
+    required this.descricao
   });
 
   factory ViaAdministracao.fromJson(Map<String, dynamic> json) {
     return ViaAdministracao(
       id: json['id'],
-      nome: json['name'],
+      descricao: json['description'],
     );
   }
 
   @override
-  String toString() => "ViaAdministracao { id: $id, nome: $nome }";
+  String toString() => "ViaAdministracao { id: $id, nome: $descricao }";
 
 }

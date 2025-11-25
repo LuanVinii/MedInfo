@@ -1,20 +1,20 @@
 class Formato {
   final int id;
-  final String nome;
+  final String descricao;
 
   Formato({
     required this.id,
-    required this.nome
+    required this.descricao
   });
 
   factory Formato.fromJson(Map<String, dynamic> json) {
     return Formato(
       id: json['id'],
-      nome: json['name'],
+      descricao: json['description'],
     );
   }
 
   @override
-  String toString() => "Formato { id: $id, nome: $nome }";
+  String toString() => "Formato { id: $id, descricao: $descricao }";
 
 }

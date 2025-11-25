@@ -1,34 +1,40 @@
+import 'package:medinfo/models/categoria.dart';
+import 'package:medinfo/models/formato.dart';
+import 'package:medinfo/models/laboratorio.dart';
+import 'package:medinfo/models/tarja.dart';
+import 'package:medinfo/models/via_administracao.dart';
+
 class Medicamento {
   final int id;
   final String nome;
-  final int categoriaId;
-  final String formatoId;
-  final int viaAdministracaoId;
-  final int tarjaId;
+  final Categoria categoria;
+  final Formato formato;
+  final ViaAdministracao viaAdministracao;
+  final Tarja tarja;
   final double precoMedio;
-  final int laboratorioId;
+  final Laboratorio laboratorio;
 
   Medicamento({
     required this.id,
     required this.nome,
-    required this.categoriaId,
-    required this.formatoId,
-    required this.viaAdministracaoId,
-    required this.tarjaId,
+    required this.categoria,
+    required this.formato,
+    required this.viaAdministracao,
+    required this.tarja,
     required this.precoMedio,
-    required this.laboratorioId
+    required this.laboratorio
   });
 
   factory Medicamento.fromJson(Map<String, dynamic> json) {
     return Medicamento(
       id: json['id'],
       nome: json['name'],
-      categoriaId: json['category_id'],
-      formatoId: json['format_id'],
-      viaAdministracaoId: json['admroute_id'],
-      tarjaId: json['labelclass_id'],
+      categoria: Categoria.fromJson(json['categories']),
+      formato: Formato.fromJson(json['formats']),
+      viaAdministracao: ViaAdministracao.fromJson(json['admroutes']),
+      tarja: Tarja.fromJson(json['labelclasses']),
       precoMedio: json['average_price'],
-      laboratorioId: json['laboratory_id']
+      laboratorio: Laboratorio.fromJson(json['laboratories'])
     );
   }
 
@@ -36,10 +42,10 @@ class Medicamento {
   String toString() => "Medicamento { "
         "id: $id, "
         "nome: $nome, "
-        "categoriaId: $categoriaId, "
-        "formatoId: $formatoId, "
-        "viaAdministracaoId: $viaAdministracaoId, "
-        "tarjaId: $tarjaId, "
+        "categoria: $categoria, "
+        "formato: $formato, "
+        "viaAdministracao: $viaAdministracao, "
+        "tarja: $tarja, "
         "precoMedio: $precoMedio, "
-        "laboratorioId: $laboratorioId }";
+        "laboratorio: $laboratorio }";
 }

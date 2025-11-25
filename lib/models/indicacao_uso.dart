@@ -1,20 +1,20 @@
 class IndicacaoUso {
   final int id;
-  final String nome;
+  final String descricao;
 
   IndicacaoUso({
     required this.id,
-    required this.nome
+    required this.descricao
   });
 
   factory IndicacaoUso.fromJson(Map<String, dynamic> json) {
     return IndicacaoUso(
       id: json['id'],
-      nome: json['name'],
+      descricao: json['description'],
     );
   }
 
   @override
-  String toString() => "IndicacaoUso { id: $id, nome: $nome }";
+  String toString() => "IndicacaoUso { id: $id, descricao: $descricao }";
 
 }
