@@ -6,7 +6,7 @@ import '/services/medicamento.dart';
 class MedicamentoRepository {
   final MedicamentoService service;
 
-  MedicamentoRepository(MedicamentoService? service) : service = service ?? MedicamentoService();
+  MedicamentoRepository({MedicamentoService? service}) : service = service ?? MedicamentoService();
 
   Future<List<Medicamento>> buscarPorNome(String nome) async {
     return await service.buscarPorNome(nome);
