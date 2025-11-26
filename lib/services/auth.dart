@@ -1,109 +1,104 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-/// Serviço de autenticação usando Supabase
+import '../models/usuario.dart';
+
+/// Serviço de autenticação usando **apenas** a tabela `users` do banco.
+///
+/// Não usa o módulo de autenticação do Supabase, apenas a conexão
+/// com o banco de dados para ler/escrever na tabela `users`.
 class AuthService {
   final SupabaseClient _supabase = Supabase.instance.client;
 
-  /// Retorna o cliente Supabase
-  SupabaseClient get client => _supabase;
+  Usuario? _currentUser;
 
-  /// Retorna o usuário atual logado
-  User? get currentUser => _supabase.auth.currentUser;
+  /// Usuário atual em memória (apenas enquanto o app está aberto).
+  Usuario? get currentUser => _currentUser;
 
-  /// Verifica se existe um usuário logado
-  bool get isAuthenticated => currentUser != null;
+  /// Indica se existe um usuário logado em memória.
+  bool get isAuthenticated => _currentUser != null;
 
-  /// Realiza o login com email e senha
-  /// 
-  /// Retorna o usuário autenticado em caso de sucesso
-  /// Lança uma exceção em caso de erro
-  Future<User?> login({
+  /// Realiza o login buscando na tabela `users` pelo par (email, password).
+  ///
+  /// Lança [Exception] com mensagem amigável em caso de erro.
+  Future<Usuario> login({
     required String email,
     required String password,
   }) async {
     try {
-      final response = await _supabase.auth.signInWithPassword(
-        email: email,
-        password: password,
-      );
+      final data = await _supabase
+          .from('users')
+          .select()
+          .eq('email', email)
+          .eq('password', password)
+          .maybeSingle();
 
-      return response.user;
-    } on AuthException catch (e) {
-      throw _handleAuthException(e);
+      if (data == null) {
+        throw Exception('Email ou senha incorretos');
+      }
+
+      _currentUser = Usuario.fromJson(Map<String, dynamic>.from(data));
+      return _currentUser!;
+    } on PostgrestException catch (e) {
+      throw Exception('Erro no banco de dados: ${e.message}');
     } catch (e) {
       throw Exception('Erro ao fazer login: $e');
     }
   }
 
-  /// Realiza o cadastro de um novo usuário
-  /// 
-  /// Retorna o usuário criado em caso de sucesso
-  /// Lança uma exceção em caso de erro
-  Future<User?> cadastrar({
+  /// Realiza o cadastro inserindo um novo registro na tabela `users`.
+  ///
+  /// - Verifica primeiro se já existe usuário com o mesmo email.
+  /// - Em seguida insere name/email/password.
+  Future<Usuario> cadastrar({
     required String nome,
     required String email,
     required String password,
   }) async {
     try {
-      final response = await _supabase.auth.signUp(
-        email: email,
-        password: password,
-        data: {
-          'name': nome,
-        },
-      );
+      // Verifica se já existe usuário com esse email
+      final existing = await _supabase
+          .from('users')
+          .select('id')
+          .eq('email', email)
+          .maybeSingle();
 
-      return response.user;
-    } on AuthException catch (e) {
-      throw _handleAuthException(e);
+      if (existing != null) {
+        throw Exception('Este email já está cadastrado');
+      }
+
+      // Insere novo usuário e retorna o registro criado
+      final inserted = await _supabase
+          .from('users')
+          .insert({
+            'name': nome,
+            'email': email,
+            'password': password,
+          })
+          .select()
+          .single();
+
+      _currentUser = Usuario.fromJson(Map<String, dynamic>.from(inserted));
+      return _currentUser!;
+    } on PostgrestException catch (e) {
+      throw Exception('Erro ao criar conta: ${e.message}');
     } catch (e) {
       throw Exception('Erro ao criar conta: $e');
     }
   }
 
-  /// Realiza o logout do usuário
+  /// "Logout" simples: apenas limpa o usuário em memória.
   Future<void> logout() async {
-    try {
-      await _supabase.auth.signOut();
-    } on AuthException catch (e) {
-      throw _handleAuthException(e);
-    } catch (e) {
-      throw Exception('Erro ao fazer logout: $e');
-    }
+    _currentUser = null;
   }
 
-  /// Envia email de recuperação de senha
+  /// Como estamos usando apenas a tabela `users` e não o módulo de Auth
+  /// do Supabase, não há envio automático de email de recuperação de senha.
+  ///
+  /// Aqui apenas lançamos uma exceção explicando a limitação.
   Future<void> recuperarSenha(String email) async {
-    try {
-      await _supabase.auth.resetPasswordForEmail(email);
-    } on AuthException catch (e) {
-      throw _handleAuthException(e);
-    } catch (e) {
-      throw Exception('Erro ao enviar email de recuperação: $e');
-    }
-  }
-
-  /// Stream que monitora mudanças no estado de autenticação
-  Stream<AuthState> get authStateChanges => _supabase.auth.onAuthStateChange;
-
-  /// Traduz exceções do Supabase para mensagens em português
-  String _handleAuthException(AuthException e) {
-    switch (e.message) {
-      case 'Invalid login credentials':
-        return 'Email ou senha incorretos';
-      case 'Email not confirmed':
-        return 'Email não confirmado. Verifique sua caixa de entrada';
-      case 'User already registered':
-        return 'Este email já está cadastrado';
-      case 'Password should be at least 6 characters':
-        return 'A senha deve ter pelo menos 6 caracteres';
-      case 'Invalid email':
-        return 'Email inválido';
-      case 'Email rate limit exceeded':
-        return 'Muitas tentativas. Tente novamente mais tarde';
-      default:
-        return e.message;
-    }
+    throw Exception(
+      'Recuperação de senha ainda não está disponível neste modo de autenticação.',
+    );
   }
 }
 
