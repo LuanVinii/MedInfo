@@ -2,24 +2,20 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../models/usuario.dart';
 
-/// Serviço de autenticação usando **apenas** a tabela `users` do banco.
-///
-/// Não usa o módulo de autenticação do Supabase, apenas a conexão
-/// com o banco de dados para ler/escrever na tabela `users`.
 class AuthService {
+  AuthService._internal();
+  static final AuthService _instance = AuthService._internal();
+
+  factory AuthService() => _instance;
+
   final SupabaseClient _supabase = Supabase.instance.client;
 
   Usuario? _currentUser;
 
-  /// Usuário atual em memória (apenas enquanto o app está aberto).
   Usuario? get currentUser => _currentUser;
 
-  /// Indica se existe um usuário logado em memória.
   bool get isAuthenticated => _currentUser != null;
 
-  /// Realiza o login buscando na tabela `users` pelo par (email, password).
-  ///
-  /// Lança [Exception] com mensagem amigável em caso de erro.
   Future<Usuario> login({
     required String email,
     required String password,
@@ -45,10 +41,6 @@ class AuthService {
     }
   }
 
-  /// Realiza o cadastro inserindo um novo registro na tabela `users`.
-  ///
-  /// - Verifica primeiro se já existe usuário com o mesmo email.
-  /// - Em seguida insere name/email/password.
   Future<Usuario> cadastrar({
     required String nome,
     required String email,

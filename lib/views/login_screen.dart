@@ -68,54 +68,6 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  Future<void> _handleRecuperarSenha() async {
-    final email = _emailController.text.trim();
-    
-    if (email.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('Por favor, insira seu email primeiro'),
-          backgroundColor: Colors.orange[400],
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-        ),
-      );
-      return;
-    }
-
-    try {
-      await _authService.recuperarSenha(email);
-      
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text('Email de recuperação enviado! Verifique sua caixa de entrada.'),
-            backgroundColor: Colors.green,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-          ),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(e.toString()),
-            backgroundColor: Colors.red[400],
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-          ),
-        );
-      }
-    }
-  }
-
   void _navigateToCadastro() {
     Navigator.push(
       context,
@@ -321,23 +273,6 @@ class _LoginScreenState extends State<LoginScreen> {
                               }
                               return null;
                             },
-                          ),
-
-                          const SizedBox(height: 12),
-
-                          // Link "Esqueci minha senha"
-                          Align(
-                            alignment: Alignment.centerRight,
-                            child: TextButton(
-                              onPressed: _handleRecuperarSenha,
-                              child: const Text(
-                                'Esqueci minha senha',
-                                style: TextStyle(
-                                  color: Color(0xFF023542),
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
                           ),
 
                           const SizedBox(height: 20),

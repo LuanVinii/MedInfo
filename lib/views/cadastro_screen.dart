@@ -19,7 +19,6 @@ class _CadastroScreenState extends State<CadastroScreen> {
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
   bool _isLoading = false;
-  bool _aceitouTermos = false;
 
   @override
   void dispose() {
@@ -31,20 +30,6 @@ class _CadastroScreenState extends State<CadastroScreen> {
   }
 
   Future<void> _handleCadastro() async {
-    if (!_aceitouTermos) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('Você precisa aceitar os termos de uso'),
-          backgroundColor: Colors.red[400],
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-        ),
-      );
-      return;
-    }
-
     if (_formKey.currentState?.validate() ?? false) {
       setState(() {
         _isLoading = true;
@@ -428,60 +413,6 @@ class _CadastroScreenState extends State<CadastroScreen> {
                                     }
                                     return null;
                                   },
-                                ),
-
-                                const SizedBox(height: 20),
-
-                                // Checkbox de Termos
-                                Row(
-                                  children: [
-                                    Checkbox(
-                                      value: _aceitouTermos,
-                                      onChanged: (value) {
-                                        setState(() {
-                                          _aceitouTermos = value ?? false;
-                                        });
-                                      },
-                                      activeColor: const Color(0xFF023542),
-                                    ),
-                                    Expanded(
-                                      child: GestureDetector(
-                                        onTap: () {
-                                          setState(() {
-                                            _aceitouTermos = !_aceitouTermos;
-                                          });
-                                        },
-                                        child: RichText(
-                                          text: const TextSpan(
-                                            style: TextStyle(
-                                              color: Colors.black87,
-                                              fontSize: 14,
-                                            ),
-                                            children: [
-                                              TextSpan(text: 'Aceito os '),
-                                              TextSpan(
-                                                text: 'termos de uso',
-                                                style: TextStyle(
-                                                  color: Color(0xFF023542),
-                                                  fontWeight: FontWeight.bold,
-                                                  decoration: TextDecoration.underline,
-                                                ),
-                                              ),
-                                              TextSpan(text: ' e a '),
-                                              TextSpan(
-                                                text: 'política de privacidade',
-                                                style: TextStyle(
-                                                  color: Color(0xFF023542),
-                                                  fontWeight: FontWeight.bold,
-                                                  decoration: TextDecoration.underline,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
                                 ),
 
                                 const SizedBox(height: 25),
