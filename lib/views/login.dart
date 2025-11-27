@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
-import '../widgets/global_background.dart';
+import 'package:medinfo/widgets/globais.dart';
 import '../services/auth.dart';
-import 'cadastro_screen.dart';
-import 'app_shell.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+import '/views/cadastro.dart';
+import '/views/main.dart';
+
+class LoginView extends StatefulWidget {
+  const LoginView({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<LoginView> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends State<LoginView> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _senhaController = TextEditingController();
@@ -41,7 +42,7 @@ class _LoginScreenState extends State<LoginScreen> {
         // Login bem-sucedido - navegar para a tela principal
         if (mounted) {
           Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (context) => const AppShell()),
+            MaterialPageRoute(builder: (context) => const MainAppView()),
           );
         }
       } catch (e) {
@@ -71,13 +72,13 @@ class _LoginScreenState extends State<LoginScreen> {
   void _navigateToCadastro() {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const CadastroScreen()),
+      MaterialPageRoute(builder: (context) => const CadastroView()),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return GlobalBackground(
+    return AppContentWrapper(
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: SafeArea(
@@ -291,20 +292,20 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                             child: _isLoading
                                 ? const SizedBox(
-                                    height: 20,
-                                    width: 20,
-                                    child: CircularProgressIndicator(
-                                      color: Colors.white,
-                                      strokeWidth: 2,
-                                    ),
-                                  )
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 2,
+                              ),
+                            )
                                 : const Text(
-                                    'Entrar',
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
+                              'Entrar',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                           ),
 
                           const SizedBox(height: 20),

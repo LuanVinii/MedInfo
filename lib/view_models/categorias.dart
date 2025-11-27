@@ -15,7 +15,7 @@ class CategoriasViewModel extends StateNotifier<CategoriasViewModelState> {
 
   Future<void> obterTodas() async {
     state = CategoriasViewModelState(estaCarregando: true);
-    List<Categoria>? categorias;
+    List<Categoria> categorias = [];
     AppException? erro;
 
     try {
@@ -34,12 +34,12 @@ class CategoriasViewModel extends StateNotifier<CategoriasViewModelState> {
 
 class CategoriasViewModelState {
   final bool estaCarregando;
-  final List<Categoria>? categorias;
+  final List<Categoria> categorias;
   final AppException? erro;
 
   CategoriasViewModelState({
     this.estaCarregando = false,
-    this.categorias,
+    this.categorias = const [],
     this.erro
   });
 }

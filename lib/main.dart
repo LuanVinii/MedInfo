@@ -2,7 +2,8 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:medinfo/views/login_screen.dart';
+
+import 'views/boot.dart';
 
 Future<void> main() async {
   await dotenv.load(fileName: '.env');
@@ -22,12 +23,11 @@ Future<void> main() async {
 
   await Supabase.initialize(url: databaseUrl, anonKey: databaseKey);
 
-  // Inicia o app e carrega o widget principal
-  runApp(ProviderScope(child: MyApp()));
+  runApp(ProviderScope(child: MainApp()));
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class MainApp extends StatelessWidget {
+  const MainApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +36,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       // Nome exibido em lugares do sistema
       title: 'MedInfo',
-      home: const LoginScreen(),
+      home: const BootView(),
     );
   }
 }

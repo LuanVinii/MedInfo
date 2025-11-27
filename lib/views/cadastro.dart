@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
-import '../widgets/global_background.dart';
+import 'package:medinfo/widgets/globais.dart';
 import '../services/auth.dart';
 
-class CadastroScreen extends StatefulWidget {
-  const CadastroScreen({super.key});
+class CadastroView extends StatefulWidget {
+  const CadastroView({super.key});
 
   @override
-  State<CadastroScreen> createState() => _CadastroScreenState();
+  State<CadastroView> createState() => _CadastroScreenState();
 }
 
-class _CadastroScreenState extends State<CadastroScreen> {
+class _CadastroScreenState extends State<CadastroView> {
   final _formKey = GlobalKey<FormState>();
   final _nomeController = TextEditingController();
   final _emailController = TextEditingController();
@@ -85,7 +85,7 @@ class _CadastroScreenState extends State<CadastroScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return GlobalBackground(
+    return AppContentWrapper(
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: SafeArea(
@@ -431,20 +431,20 @@ class _CadastroScreenState extends State<CadastroScreen> {
                                   ),
                                   child: _isLoading
                                       ? const SizedBox(
-                                          height: 20,
-                                          width: 20,
-                                          child: CircularProgressIndicator(
-                                            color: Colors.white,
-                                            strokeWidth: 2,
-                                          ),
-                                        )
+                                    height: 20,
+                                    width: 20,
+                                    child: CircularProgressIndicator(
+                                      color: Colors.white,
+                                      strokeWidth: 2,
+                                    ),
+                                  )
                                       : const Text(
-                                          'Cadastrar',
-                                          style: TextStyle(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
+                                    'Cadastrar',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
                                 ),
 
                                 const SizedBox(height: 20),

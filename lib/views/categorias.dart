@@ -1,83 +1,81 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/categoria.dart';
-// Este arquivo não usa o GlobalBackground diretamente porque isso é feito no AppShell
-import '../widgets/shared_widgets.dart';
+import '../view_models/categorias.dart';
+import '../widgets/globais.dart';
 
 // Cor padrão do projeto (azul petróleo). Mantemos como const para evitar repetição.
 const Color _primaryColor = Color(0xFF023542);
 
-class CategoriaScreen extends StatelessWidget {
-  CategoriaScreen({super.key});
+final _allMedicalIcons = [
+  Icons.medication_liquid,
+  Icons.medication,
+  Icons.local_hospital,
+  Icons.medical_services,
+  Icons.vaccines,
+  Icons.health_and_safety,
+  Icons.healing,
+  Icons.medical_information,
+  Icons.sick,
+  Icons.coronavirus,
+  Icons.airline_seat_flat,
+  Icons.monitor_heart,
+  Icons.biotech,
+  Icons.science,
+  Icons.psychology,
+  Icons.thermostat,
+  Icons.water_drop,
+  Icons.masks,
+];
 
-  // Lista fixa de categorias exibidas na tela.
-  // Cada item tem id, nome, descrição e um identificador de ícone.
-  // Isso mantém a tela limpa e evita código repetido.
-  final List<Categoria> _categorias = [
-    Categoria(id: 1, nome: 'Antigripais', descricao: 'Alívio de sintomas de gripe', icone: 'antigripais'),
-    Categoria(id: 2, nome: 'Analgésico', descricao: 'Para dor e desconforto', icone: 'analgesico'),
-    Categoria(id: 3, nome: 'Antialérgicos', descricao: 'Controle de reações alérgicas', icone: 'antialergicos'),
-    Categoria(id: 4, nome: 'Anti-inflamatório', descricao: 'Reduz inflamação e dor', icone: 'antiinflamatorio'),
-    Categoria(id: 5, nome: 'Antibiótico', descricao: 'Combate infecções', icone: 'antibiotico'),
-  ];
+class CategoriasView extends ConsumerWidget {
+  const CategoriasView({super.key});
 
-  // Função que converte o nome do ícone (string) para um ícone real do Flutter.
-  // Isso reúne toda a lógica de ícones em um lugar só e evita vários if/else na interface.
-  IconData _getIconData(String iconName) {
-    switch (iconName) {
-      case 'antigripais': return Icons.medication_liquid;
-      case 'analgesico': return Icons.medication;
-      case 'antialergicos': return Icons.local_hospital;
-      case 'antiinflamatorio': return Icons.medical_services;
-      case 'antibiotico': return Icons.vaccines;
-      default: return Icons.medical_services;
-    }
-  }
+  IconData _getRandomIconData(String iconName) => _allMedicalIcons[Random().nextInt(_allMedicalIcons.length)];
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      // Deixamos transparente para que o background geral apareça por trás
-      backgroundColor: Colors.transparent,
+  Widget build(BuildContext context, WidgetRef ref) {
+    CategoriasViewModelState state = ref.watch(categoriasViewModelProvider);
 
-      // Toda a estrutura da tela fica dentro de um Column
-      body: Column(
-        children: [
-          // Barra superior reutilizável (menu, logo, perfil)
-          const CustomAppBar(),
+    return Column(
+      children: [
+        // Barra superior reutilizável (menu, logo, perfil)
+        UserAppBar(),
 
-          // Cabeçalho da página com o título
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(vertical: 20),
-            color: _primaryColor,
-            child: const Text(
-              "Categoria",
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
+        // Cabeçalho da página com o título
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(vertical: 20),
+          color: _primaryColor,
+          child: const Text(
+            "Categoria",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
             ),
           ),
+        ),
 
-          // Lista das categorias com rolagem
-          Expanded(
-            child: ListView.builder(
-              physics: const BouncingScrollPhysics(), // Rolagem mais suave
-              padding: const EdgeInsets.only(top: 16, bottom: 16),
-              itemCount: _categorias.length,
-              itemBuilder: (context, index) {
-                final categoria = _categorias[index];
-                return CategoryCard(
-                  categoria: categoria,
-                  iconData: _getIconData(categoria.icone),
-                );
-              },
-            ),
+        // CORREÇÃO: Expanded envolvendo a ListView
+        Expanded(
+          child: ListView.builder(
+            physics: const BouncingScrollPhysics(), // Rolagem mais suave
+            padding: const EdgeInsets.only(top: 16, bottom: 16),
+            itemCount: state.categorias.length,
+            itemBuilder: (context, index) {
+              final categoria = state.categorias[index];
+              return CategoryCard(
+                categoria: categoria,
+                iconData: _getRandomIconData(categoria.icone),
+              );
+            },
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
