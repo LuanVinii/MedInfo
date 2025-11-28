@@ -1,6 +1,7 @@
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:medinfo/views/home.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'views/boot.dart';
@@ -36,7 +37,8 @@ class MainApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       // Nome exibido em lugares do sistema
       title: 'MedInfo',
-      home: const BootView(),
+      home: HomeView(),
     );
   }
+
 }

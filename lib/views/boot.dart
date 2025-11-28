@@ -107,18 +107,11 @@ class _LoadingView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(children: [
-      _loadingIndicator(),
+      loadingIndicator(),
       _InfoView()
     ]);
   }
 
-  Widget _loadingIndicator() {
-    return LinearProgressIndicator(
-      minHeight: 7,
-      backgroundColor: Colors.white,
-      color: Color(0xFF246678),
-    );
-  }
 }
 
 class _InfoView extends StatelessWidget {

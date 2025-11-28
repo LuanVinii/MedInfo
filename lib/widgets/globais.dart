@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:medinfo/main.dart';
+
+import '/view_models/navigation.dart';
 
 class AppContentWrapper extends StatelessWidget {
   final double backgroundOpacity;
@@ -61,6 +65,87 @@ class UserAppBar extends StatelessWidget {
       icon: const Icon(Icons.account_circle, color: Color(0xFF023542), size: 35),
     );
   }
+}
+
+class NavigationBar extends ConsumerWidget {
+  const NavigationBar({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    var state = ref.watch(navigationViewModelProvider);
+    return BottomNavigationBar(
+        currentIndex: state.currentIndex,
+        backgroundColor: Color(0xFF023542),
+        selectedItemColor: Colors.white,
+        unselectedItemColor: Colors.white70,
+        selectedLabelStyle: TextStyle(
+          color: Colors.white,
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+        ),
+        unselectedLabelStyle: TextStyle(
+          color: Colors.white70,
+          fontSize: 14,
+        ),
+        type: BottomNavigationBarType.fixed, // Importante para mais de 3 itens
+        onTap: (index) {
+          ref.read(navigationViewModelProvider.notifier).navigateByIndex(index, context);
+        },
+        items: [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home, size: 36),
+            label: 'Início',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.medical_services, size: 36),
+            label: 'Categorias',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.bookmark, size: 36),
+            label: 'Salvos',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings, size: 36),
+            label: 'Ajustes',
+          )
+        ]
+    );
+  }
+
+}
+
+class AppScaffold extends StatelessWidget {
+  final List<Widget> mainContent;
+
+  const AppScaffold({super.key, this.mainContent = const []});
+
+  Widget _scrollableContent() => Expanded(
+      child: SingleChildScrollView(
+        child: Column(children: mainContent))
+  );
+
+  @override
+  Widget build(BuildContext context) {
+    return AppContentWrapper(child: Scaffold(
+      backgroundColor: Colors.transparent,
+      resizeToAvoidBottomInset: true,
+
+      body: Column(children: [
+        UserAppBar(),
+        _scrollableContent()
+      ]),
+
+      bottomNavigationBar: NavigationBar()
+    ));
+  }
+}
+
+Widget loadingIndicator() {
+  return LinearProgressIndicator(
+    minHeight: 7,
+    backgroundColor: Colors.white,
+    color: Color(0xFF246678),
+  );
 }
 
 Widget mainLogo({double scale = 1}) => SizedBox(

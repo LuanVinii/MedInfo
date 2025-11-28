@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:medinfo/view_models/navigation.dart';
+import 'package:medinfo/views/busca.dart';
 
 import '/widgets/globais.dart';
 
@@ -23,49 +25,23 @@ class _HomeViewState extends State<HomeView> {
     // Aqui depois você pode salvar no SharedPreferences para lembrar entre sessões
   }
 
+  Widget _paddedDisclaimerBox() => Container(
+    padding: EdgeInsets.all(16.0),
+    child: DisclaimerBox(
+      isAcknowledged: _disclaimerAcknowledged,
+      onAcknowledge: _acknowledgeDisclaimer,
+    ),
+  );
+
   @override
   Widget build(BuildContext context) {
-    // O Scaffold é o esqueleto da tela, mas com fundo transparente
-    // Para permitir que o widget GlobalBackground apareça atrás
-    return Column(
-      children: [
-        // AppBar reutilizável do projeto
-        const UserAppBar(),
-
-        // Faixa azul do topo com o título e ícone
-        const HeaderSection(),
-
-        // Toda a parte de conteúdo abaixo pode rolar
-        Expanded(
-          child: SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-
-              // Coluna principal da Home
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // Pequeno espaçamento após o header
-                  const SizedBox(height: 10),
-
-                  // Caixa do aviso ("Atenção!")
-                  DisclaimerBox(
-                    isAcknowledged: _disclaimerAcknowledged,
-                    onAcknowledge: _acknowledgeDisclaimer,
-                  ),
-
-                  const SizedBox(height: 20),
-
-                  // Aqui futuramente entram categorias, medicamentos recentes, etc.
-                  // ...
-                ],
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
+    return AppScaffold(mainContent: [
+      HeaderSection(),
+      SizedBox(height: 10),
+      SingleChildScrollView(child: _paddedDisclaimerBox())
+    ]);
   }
+
 }
 
 
@@ -129,7 +105,7 @@ class DisclaimerBox extends StatelessWidget {
           // Texto explicando a função do app
           const Text(
             "As informações apresentadas neste aplicativo são reunidas de fontes públicas da internet e têm apenas o objetivo de organizar dados sobre medicamentos em um só lugar.\n\n"
-            "Elas não substituem consulta médica, diagnóstico profissional ou orientação de um farmacêutico.",
+                "Elas não substituem consulta médica, diagnóstico profissional ou orientação de um farmacêutico.",
             style: TextStyle(
               fontSize: 15,
               height: 1.4, // Deixa o texto mais confortável de ler
@@ -182,16 +158,16 @@ class DisclaimerBox extends StatelessWidget {
 
                 // Conteúdo do botão
                 child: isAcknowledged
-                    // Se já clicou: aparece só um ícone de check
+                // Se já clicou: aparece só um ícone de check
                     ? const Icon(Icons.check, size: 24)
-                    // Se ainda não clicou: mostra "Entendi"
+                // Se ainda não clicou: mostra "Entendi"
                     : const Text(
-                        "Entendi",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
-                      ),
+                  "Entendi",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
               ),
             ],
           ),
@@ -214,9 +190,15 @@ class HeaderSection extends ConsumerWidget {
         children: [
           // Campo de pesquisa
           TextField(
+            onTap: () => ref.read(navigationViewModelProvider.notifier).changeView(BuscaView(), context),
             decoration: InputDecoration(
               hintText: 'Pesquisar...',
-              suffixIcon: const Icon(Icons.search, color: Color(0xFF023542)),
+              suffixIcon: IconButton(
+                icon: Icon(Icons.search),
+                color: Color(0xFF023542),
+                onPressed: () => ref.read(navigationViewModelProvider.notifier).changeView(BuscaView(), context),
+
+              ),
               hintStyle: const TextStyle(color: Colors.black54),
               filled: true,
               fillColor: Colors.white,
@@ -360,3 +342,5 @@ class _CategoryChipState extends State<_CategoryChip>
     );
   }
 }
+
+
