@@ -1,18 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:medinfo/view_models/navigation.dart';
+import 'package:medinfo/views/home.dart';
 import 'package:medinfo/widgets/globais.dart';
 import '../services/auth.dart';
 
 import '/views/cadastro.dart';
-import '/views/main.dart';
 
-class LoginView extends StatefulWidget {
+class LoginView extends ConsumerStatefulWidget {
   const LoginView({super.key});
 
   @override
-  State<LoginView> createState() => _LoginScreenState();
+  ConsumerState<LoginView> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginView> {
+class _LoginScreenState extends ConsumerState<LoginView> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _senhaController = TextEditingController();
@@ -41,10 +43,9 @@ class _LoginScreenState extends State<LoginView> {
 
         // Login bem-sucedido - navegar para a tela principal
         if (mounted) {
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (context) => const MainAppView()),
-          );
+          ref.read(navigationViewModelProvider.notifier).changeViewReplacing(HomeView(), context);
         }
+
       } catch (e) {
         // Mostrar erro ao usuário
         if (mounted) {
@@ -67,13 +68,6 @@ class _LoginScreenState extends State<LoginView> {
         }
       }
     }
-  }
-
-  void _navigateToCadastro() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const CadastroView()),
-    );
   }
 
   @override
@@ -352,7 +346,7 @@ class _LoginScreenState extends State<LoginView> {
                                 ),
                               ),
                               TextButton(
-                                onPressed: _navigateToCadastro,
+                                onPressed: () => ref.read(navigationViewModelProvider.notifier).changeView(CadastroView(), context),
                                 style: TextButton.styleFrom(
                                   padding: EdgeInsets.zero,
                                   minimumSize: const Size(0, 0),
@@ -382,4 +376,3 @@ class _LoginScreenState extends State<LoginView> {
     );
   }
 }
-

@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medinfo/widgets/globais.dart';
 import '../services/auth.dart';
 
-class CadastroView extends StatefulWidget {
+class CadastroView extends ConsumerStatefulWidget {
   const CadastroView({super.key});
 
   @override
-  State<CadastroView> createState() => _CadastroScreenState();
+  ConsumerState<CadastroView> createState() => _CadastroScreenState();
 }
 
-class _CadastroScreenState extends State<CadastroView> {
+class _CadastroScreenState extends ConsumerState<CadastroView> {
   final _formKey = GlobalKey<FormState>();
   final _nomeController = TextEditingController();
   final _emailController = TextEditingController();
@@ -91,30 +92,6 @@ class _CadastroScreenState extends State<CadastroView> {
         body: SafeArea(
           child: Column(
             children: [
-              // Botão de voltar
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Row(
-                  children: [
-                    IconButton(
-                      onPressed: () => Navigator.pop(context),
-                      icon: const Icon(
-                        Icons.arrow_back,
-                        color: Color(0xFF023542),
-                        size: 28,
-                      ),
-                    ),
-                    const Text(
-                      'Voltar',
-                      style: TextStyle(
-                        color: Color(0xFF023542),
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
 
               // Conteúdo rolável
               Expanded(
@@ -494,4 +471,3 @@ class _CadastroScreenState extends State<CadastroView> {
     );
   }
 }
-

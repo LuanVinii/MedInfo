@@ -141,13 +141,11 @@ class AppScaffold extends StatelessWidget {
   }
 }
 
-Widget loadingIndicator() {
-  return LinearProgressIndicator(
-    minHeight: 7,
-    backgroundColor: Colors.white,
-    color: Color(0xFF246678),
-  );
-}
+Widget loadingIndicator() => LinearProgressIndicator(
+  minHeight: 7,
+  backgroundColor: Colors.white,
+  color: Color(0xFF246678),
+);
 
 Widget mainLogo({double scale = 1}) => SizedBox(
   width: 280 * scale,

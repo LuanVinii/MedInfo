@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medinfo/view_models/navigation.dart';
-import 'package:medinfo/views/home.dart';
+import 'package:medinfo/views/login.dart';
 
 import '/view_models/categorias.dart';
 import '/widgets/globais.dart';
@@ -29,7 +29,7 @@ class _BootViewState extends ConsumerState<BootView> {
     ref.listen<CategoriasViewModelState>(categoriasViewModelProvider,
           (previous, next) {
         if (!next.estaCarregando && next.erro == null) {
-          ref.read(navigationViewModelProvider.notifier).changeViewReplacing(HomeView(), context);
+          ref.read(navigationViewModelProvider.notifier).changeViewReplacing(LoginView(), context);
         }
       },
     );
