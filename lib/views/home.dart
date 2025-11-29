@@ -1,9 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:medinfo/models/categoria.dart';
+import 'package:medinfo/view_models/busca.dart';
+import 'package:medinfo/view_models/categorias.dart';
 import 'package:medinfo/view_models/navigation.dart';
 import 'package:medinfo/views/busca.dart';
+import 'package:medinfo/views/categoria.dart';
 
 import '/widgets/globais.dart';
+
+final List<IconData> medicamentoIcons = [
+  Icons.medication,
+  Icons.medication_liquid,
+  Icons.local_hospital,
+  Icons.medical_services,
+  Icons.vaccines,
+  Icons.local_pharmacy,
+  Icons.healing,
+  Icons.science,
+  Icons.biotech,
+  Icons.bloodtype,
+  Icons.monitor_heart,
+  Icons.egg,           // para cápsulas
+  Icons.circle,        // para comprimidos
+];
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -121,21 +141,6 @@ class DisclaimerBox extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
 
-              // // Botão "Quero saber mais" (ainda sem lógica)
-              // TextButton(
-              //   onPressed: () {
-              //     // Navegação futura para uma tela explicando mais detalhes
-              //   },
-              //   child: const Text(
-              //     "Quero saber mais",
-              //     style: TextStyle(
-              //       color: Color(0xFF023542),
-              //       fontWeight: FontWeight.bold,
-              //       fontSize: 16,
-              //     ),
-              //   ),
-              // ),
-
               // Botão "Entendi"
               ElevatedButton(
                 onPressed: isAcknowledged ? null : onAcknowledge,
@@ -177,11 +182,146 @@ class DisclaimerBox extends StatelessWidget {
   }
 }
 
-class HeaderSection extends ConsumerWidget {
-  const HeaderSection({super.key});
+class CompactCategories extends ConsumerWidget {
+  const CompactCategories({super.key});
+
+  List<Categoria> _getRandomCategories(List<Categoria> categories) {
+    if (categories.isEmpty) {
+      return [];
+    }
+
+    // Cria uma cópia para não modificar a lista original
+    List<Categoria> shuffledCategories = List.from(categories);
+
+    // Embaralha as categorias
+    shuffledCategories.shuffle();
+
+    // Pega no máximo 3 categorias aleatórias
+    return shuffledCategories.take(3).toList();
+  }
+
+  List<IconData> _getRandomIcons(int count) {
+    if (count == 0) return [];
+
+    // Cria uma cópia da lista de ícones
+    List<IconData> shuffledIcons = List.from(medicamentoIcons);
+
+    // Embaralha os ícones
+    shuffledIcons.shuffle();
+
+    // Pega a quantidade necessária de ícones aleatórios
+    return shuffledIcons.take(count).toList();
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final categoriesState = ref.watch(categoriasViewModelProvider);
+
+    // Estado de carregamento
+    if (categoriesState.estaCarregando) {
+      return _buildLoadingState();
+    }
+
+    // Estado de erro
+    if (categoriesState.erro != null) {
+      return _buildErrorState(categoriesState.erro!.mensagem);
+    }
+
+    final mainCategories = _getRandomCategories(categoriesState.categorias);
+
+    // Estado vazio
+    if (mainCategories.isEmpty) {
+      return _buildEmptyState();
+    }
+
+    final mainIcons = _getRandomIcons(mainCategories.length);
+
+    return _buildCategoriesRow(mainCategories, mainIcons);
+  }
+
+  Widget _buildLoadingState() {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Center(
+        child: SizedBox(
+          width: 20,
+          height: 20,
+          child: CircularProgressIndicator(
+            strokeWidth: 2,
+            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildErrorState(String error) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Center(
+        child: Icon(
+          Icons.error_outline,
+          color: Colors.white,
+          size: 20,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return const SizedBox.shrink();
+  }
+
+  Widget _buildCategoriesRow(List<Categoria> categories, List<IconData> icons) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: List.generate(categories.length, (index) {
+        return Expanded(
+          child: Padding(
+            padding: EdgeInsets.only(
+              right: index < categories.length - 1 ? 8 : 0,
+            ),
+            child: _CategoryChip(
+              category: categories[index],
+              icon: icons[index],
+            ),
+          ),
+        );
+      }),
+    );
+  }
+}
+
+
+class HeaderSection extends ConsumerStatefulWidget {
+  const HeaderSection({super.key});
+
+  @override
+  ConsumerState<HeaderSection> createState() => _HeaderSectionState();
+}
+
+class _HeaderSectionState extends ConsumerState<HeaderSection> {
+  final TextEditingController _searchController = TextEditingController();
+
+  void _navigateToSearch() {
+    final searchText = _searchController.text.trim();
+    if (searchText.isNotEmpty) {
+      ref.read(buscaViewModelProvider.notifier).buscarMedicamentos(searchText);
+      ref.read(navigationViewModelProvider.notifier).changeView(
+        BuscaView(term: searchText),
+        context,
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
       color: const Color(0xFF023542),
@@ -190,14 +330,14 @@ class HeaderSection extends ConsumerWidget {
         children: [
           // Campo de pesquisa
           TextField(
-            onTap: () => ref.read(navigationViewModelProvider.notifier).changeView(BuscaView(), context),
+            controller: _searchController,
+            onSubmitted: (_) => _navigateToSearch(),
             decoration: InputDecoration(
               hintText: 'Pesquisar...',
               suffixIcon: IconButton(
-                icon: Icon(Icons.search),
-                color: Color(0xFF023542),
-                onPressed: () => ref.read(navigationViewModelProvider.notifier).changeView(BuscaView(), context),
-
+                icon: const Icon(Icons.search),
+                color: const Color(0xFF023542),
+                onPressed: _navigateToSearch,
               ),
               hintStyle: const TextStyle(color: Colors.black54),
               filled: true,
@@ -212,58 +352,28 @@ class HeaderSection extends ConsumerWidget {
 
           const SizedBox(height: 20),
 
-          // Lista das categorias com animação no clique
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: const [
-              Flexible(child: _CategoryChip(icon: Icons.medication_liquid, label: 'Antigripais')),
-              SizedBox(width: 8),
-              Flexible(child: _CategoryChip(icon: Icons.medication, label: 'Analgésico')),
-              SizedBox(width: 8),
-              Flexible(child: _CategoryChip(icon: Icons.local_hospital, label: 'Antialérgico')),
-            ],
-          ),
+          CompactCategories()
 
-          const SizedBox(height: 15),
-
-          // Botão de adicionar item
-          Align(
-            alignment: Alignment.centerRight,
-            child: Container(
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black26,
-                    blurRadius: 4,
-                    offset: Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: IconButton(
-                onPressed: () {},
-                icon: const Icon(Icons.add, color: Color(0xFF023542), size: 28),
-              ),
-            ),
-          ),
         ],
       ),
     );
   }
 }
 
-class _CategoryChip extends StatefulWidget {
+class _CategoryChip extends ConsumerStatefulWidget {
+  final Categoria category;
   final IconData icon;
-  final String label;
 
-  const _CategoryChip({required this.icon, required this.label});
+  const _CategoryChip({
+    required this.category,
+    required this.icon,
+  });
 
   @override
-  State<_CategoryChip> createState() => _CategoryChipState();
+  ConsumerState<_CategoryChip> createState() => _CategoryChipState();
 }
 
-class _CategoryChipState extends State<_CategoryChip>
+class _CategoryChipState extends ConsumerState<_CategoryChip>
     with SingleTickerProviderStateMixin {
 
   late AnimationController _controller;
@@ -273,7 +383,6 @@ class _CategoryChipState extends State<_CategoryChip>
   void initState() {
     super.initState();
 
-    // Controla o efeito de diminuir e voltar ao tamanho normal
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 120),
@@ -286,27 +395,20 @@ class _CategoryChipState extends State<_CategoryChip>
       curve: Curves.easeOut,
     );
 
-    // Define o tamanho inicial
     _controller.value = 1.0;
   }
 
   @override
   void dispose() {
-    // Libera o controller quando o chip não existir mais
     _controller.dispose();
     super.dispose();
   }
 
-  // Função que dispara o efeito completo
-  void _animate() async {
-    await _controller.reverse();
-    await _controller.forward();
-  }
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: _animate,
+      onTap: () => ref.read(navigationViewModelProvider.notifier).changeView(CategoriaView(categoria: widget.category), context),
       onTapDown: (_) => _controller.reverse(),
       onTapUp: (_) => _controller.forward(),
       onTapCancel: () => _controller.forward(),
@@ -326,7 +428,7 @@ class _CategoryChipState extends State<_CategoryChip>
               const SizedBox(width: 5),
               Flexible(
                 child: Text(
-                  widget.label,
+                  widget.category.nome,
                   style: const TextStyle(
                     color: Colors.black87,
                     fontWeight: FontWeight.bold,
@@ -342,5 +444,3 @@ class _CategoryChipState extends State<_CategoryChip>
     );
   }
 }
-
-

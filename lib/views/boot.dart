@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:medinfo/view_models/navigation.dart';
+import 'package:medinfo/views/home.dart';
 
 import '/view_models/categorias.dart';
-import '/views/login.dart';
 import '/widgets/globais.dart';
 
 class BootView extends ConsumerStatefulWidget {
@@ -28,7 +29,7 @@ class _BootViewState extends ConsumerState<BootView> {
     ref.listen<CategoriasViewModelState>(categoriasViewModelProvider,
           (previous, next) {
         if (!next.estaCarregando && next.erro == null) {
-          _toLoginView();
+          ref.read(navigationViewModelProvider.notifier).changeViewReplacing(HomeView(), context);
         }
       },
     );
@@ -41,14 +42,6 @@ class _BootViewState extends ConsumerState<BootView> {
       return _ErrorView();
     }
     return _LoadingView();
-  }
-
-  void _toLoginView() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => LoginView()),
-      );
-    });
   }
 
 }

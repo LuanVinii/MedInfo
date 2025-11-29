@@ -2,6 +2,9 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:medinfo/view_models/categoria.dart';
+import 'package:medinfo/view_models/navigation.dart';
+import 'package:medinfo/views/categoria.dart';
 import '../models/categoria.dart';
 import '../view_models/categorias.dart';
 import '../widgets/globais.dart';
@@ -39,10 +42,10 @@ class CategoriasView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     CategoriasViewModelState state = ref.watch(categoriasViewModelProvider);
 
-    return Column(
-      children: [
-        // Barra superior reutilizável (menu, logo, perfil)
-        UserAppBar(),
+    return AppScaffold(
+      scrollable: false,
+
+      mainContent: [
 
         // Cabeçalho da página com o título
         Container(
@@ -80,7 +83,7 @@ class CategoriasView extends ConsumerWidget {
   }
 }
 
-class CategoryCard extends StatelessWidget {
+class CategoryCard extends ConsumerWidget {
   final Categoria categoria;
   final IconData iconData;
 
@@ -91,7 +94,7 @@ class CategoryCard extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Padding(
       // Distância horizontal e vertical entre os cards
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -118,7 +121,8 @@ class CategoryCard extends StatelessWidget {
           highlightColor: Colors.transparent,
 
           onTap: () {
-            // Aqui vai a navegação para os medicamentos da categoria no futuro
+            ref.read(categoriaViewModelProvider(categoria).notifier).obterMedicamentos();
+            ref.read(navigationViewModelProvider.notifier).changeView(CategoriaView(categoria: categoria), context);
           },
 
           child: Row(

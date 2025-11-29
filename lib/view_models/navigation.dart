@@ -17,9 +17,7 @@ class NavigationViewModel extends StateNotifier<NavigationViewModelState> {
 
   NavigationViewModel() : super(NavigationViewModelState());
 
-  void navigateByIndex(index, context) {
-    state = NavigationViewModelState(currentIndex: index);
-  }
+  void navigateByIndex(index, context) => changeView(_mainViews[index], context, newIndex: index);
 
   void changeView(Widget targetView, BuildContext context, {int? newIndex}) {
     WidgetsBinding.instance.addPostFrameCallback((_) {

@@ -8,9 +8,7 @@ class BookmarksView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Column(children: [
-      UserAppBar()
-    ]);
+    return AppScaffold();
   }
 
 }

@@ -14,7 +14,7 @@ class BuscaViewModel extends StateNotifier<BuscaViewModelState> {
   BuscaViewModel() : super(BuscaViewModelState());
 
   Future<void> buscarMedicamentos(String termo) async {
-    state = BuscaViewModelState(estaCarregando: true);
+    state = BuscaViewModelState(estaCarregando: true, medicamentos: state.medicamentos);
     List<Medicamento> medicamentos = [];
     AppException? erro;
 

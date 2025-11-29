@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:medinfo/main.dart';
 
 import '/view_models/navigation.dart';
 
@@ -116,27 +115,29 @@ class NavigationBar extends ConsumerWidget {
 
 class AppScaffold extends StatelessWidget {
   final List<Widget> mainContent;
+  final bool scrollable;
 
-  const AppScaffold({super.key, this.mainContent = const []});
-
-  Widget _scrollableContent() => Expanded(
-      child: SingleChildScrollView(
-        child: Column(children: mainContent))
-  );
+  const AppScaffold({
+    super.key,
+    this.mainContent = const [],
+    this.scrollable = true
+  });
 
   @override
   Widget build(BuildContext context) {
-    return AppContentWrapper(child: Scaffold(
-      backgroundColor: Colors.transparent,
-      resizeToAvoidBottomInset: true,
+    return AppContentWrapper(
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
 
-      body: Column(children: [
-        UserAppBar(),
-        _scrollableContent()
-      ]),
+        appBar: PreferredSize(preferredSize: Size.fromHeight(150), child: UserAppBar()),
 
-      bottomNavigationBar: NavigationBar()
-    ));
+        body: scrollable
+            ? SingleChildScrollView(child: Column(children: mainContent))
+            : Column(children: mainContent),
+
+        bottomNavigationBar: NavigationBar(),
+      ),
+    );
   }
 }
 
