@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../models/usuario.dart';
@@ -5,6 +8,9 @@ import '../models/usuario.dart';
 class AuthService {
   AuthService._internal();
   static final AuthService _instance = AuthService._internal();
+  bool _isInitialized = false;
+
+  static const String _prefsUserKey = 'medinfo_current_user';
 
   factory AuthService() => _instance;
 
@@ -15,6 +21,12 @@ class AuthService {
   Usuario? get currentUser => _currentUser;
 
   bool get isAuthenticated => _currentUser != null;
+
+  Future<void> init() async {
+    if (_isInitialized) return;
+    await _restorePersistedUser();
+    _isInitialized = true;
+  }
 
   Future<Usuario> login({
     required String email,
@@ -33,6 +45,7 @@ class AuthService {
       }
 
       _currentUser = Usuario.fromJson(Map<String, dynamic>.from(data));
+      await _persistUser(_currentUser!);
       return _currentUser!;
     } on PostgrestException catch (e) {
       throw Exception('Erro no banco de dados: ${e.message}');
@@ -70,6 +83,7 @@ class AuthService {
           .single();
 
       _currentUser = Usuario.fromJson(Map<String, dynamic>.from(inserted));
+      await _persistUser(_currentUser!);
       return _currentUser!;
     } on PostgrestException catch (e) {
       throw Exception('Erro ao criar conta: ${e.message}');
@@ -81,6 +95,8 @@ class AuthService {
   /// "Logout" simples: apenas limpa o usuário em memória.
   Future<void> logout() async {
     _currentUser = null;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_prefsUserKey);
   }
 
   /// Como estamos usando apenas a tabela `users` e não o módulo de Auth
@@ -91,6 +107,33 @@ class AuthService {
     throw Exception(
       'Recuperação de senha ainda não está disponível neste modo de autenticação.',
     );
+  }
+
+  Future<void> _persistUser(Usuario usuario) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(
+      _prefsUserKey,
+      jsonEncode({
+        'id': usuario.id,
+        'name': usuario.nome,
+        'email': usuario.email,
+        'password': usuario.senha,
+      }),
+    );
+  }
+
+  Future<void> _restorePersistedUser() async {
+    final prefs = await SharedPreferences.getInstance();
+    final raw = prefs.getString(_prefsUserKey);
+    if (raw == null) return;
+
+    try {
+      final Map<String, dynamic> data = jsonDecode(raw);
+      _currentUser = Usuario.fromJson(data);
+    } catch (_) {
+      await prefs.remove(_prefsUserKey);
+      _currentUser = null;
+    }
   }
 }
 

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:medinfo/view_models/usuario.dart';
 import 'package:medinfo/widgets/globais.dart';
-import '../services/auth.dart';
 
 class CadastroView extends ConsumerStatefulWidget {
   const CadastroView({super.key});
@@ -16,10 +16,8 @@ class _CadastroScreenState extends ConsumerState<CadastroView> {
   final _emailController = TextEditingController();
   final _senhaController = TextEditingController();
   final _confirmarSenhaController = TextEditingController();
-  final _authService = AuthService();
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
-  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -31,61 +29,53 @@ class _CadastroScreenState extends ConsumerState<CadastroView> {
   }
 
   Future<void> _handleCadastro() async {
-    if (_formKey.currentState?.validate() ?? false) {
-      setState(() {
-        _isLoading = true;
-      });
+    if (!(_formKey.currentState?.validate() ?? false)) return;
 
-      try {
-        await _authService.cadastrar(
+    await ref.read(usuarioViewModelProvider.notifier).cadastrar(
           nome: _nomeController.text.trim(),
           email: _emailController.text.trim(),
-          password: _senhaController.text,
+          senha: _senhaController.text,
         );
+  }
 
-        // Cadastro bem-sucedido
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: const Text('Cadastro realizado com sucesso! Verifique seu email para confirmar.'),
-              backgroundColor: Colors.green,
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-              duration: const Duration(seconds: 4),
-            ),
-          );
-
-          // Voltar para a tela de login
-          Navigator.pop(context);
-        }
-      } catch (e) {
-        // Mostrar erro ao usuário
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(e.toString()),
-              backgroundColor: Colors.red[400],
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
-          );
-        }
-      } finally {
-        if (mounted) {
-          setState(() {
-            _isLoading = false;
-          });
-        }
-      }
-    }
+  void _mostrarSnack(String mensagem, Color corFundo, {Duration? duracao}) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(mensagem),
+        backgroundColor: corFundo,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+        duration: duracao ?? const Duration(seconds: 3),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    ref.listen<UsuarioViewModelState>(usuarioViewModelProvider, (previous, next) {
+      if (next.ultimaAcao != UsuarioAcao.cadastro || !mounted) {
+        return;
+      }
+
+      if (next.mensagemErro != null) {
+        _mostrarSnack(next.mensagemErro!, Colors.red.shade400);
+      } else {
+        _mostrarSnack(
+          'Cadastro realizado com sucesso! Verifique seu email para confirmar.',
+          Colors.green.shade600,
+          duracao: const Duration(seconds: 4),
+        );
+        Navigator.pop(context);
+      }
+
+      ref.read(usuarioViewModelProvider.notifier).limparFeedback();
+    });
+
+    final usuarioState = ref.watch(usuarioViewModelProvider);
+    final bool estaCarregando = usuarioState.estaCarregando;
+
     return AppContentWrapper(
       child: Scaffold(
         backgroundColor: Colors.transparent,
@@ -396,7 +386,7 @@ class _CadastroScreenState extends ConsumerState<CadastroView> {
 
                                 // Botão de Cadastrar
                                 ElevatedButton(
-                                  onPressed: _isLoading ? null : _handleCadastro,
+                                  onPressed: estaCarregando ? null : _handleCadastro,
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: const Color(0xFF023542),
                                     foregroundColor: Colors.white,
@@ -406,22 +396,22 @@ class _CadastroScreenState extends ConsumerState<CadastroView> {
                                     ),
                                     elevation: 3,
                                   ),
-                                  child: _isLoading
+                                  child: estaCarregando
                                       ? const SizedBox(
-                                    height: 20,
-                                    width: 20,
-                                    child: CircularProgressIndicator(
-                                      color: Colors.white,
-                                      strokeWidth: 2,
-                                    ),
-                                  )
+                                          height: 20,
+                                          width: 20,
+                                          child: CircularProgressIndicator(
+                                            color: Colors.white,
+                                            strokeWidth: 2,
+                                          ),
+                                        )
                                       : const Text(
-                                    'Cadastrar',
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
+                                          'Cadastrar',
+                                          style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
                                 ),
 
                                 const SizedBox(height: 20),

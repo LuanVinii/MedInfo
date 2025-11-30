@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medinfo/view_models/navigation.dart';
+import 'package:medinfo/view_models/usuario.dart';
 import 'package:medinfo/views/home.dart';
 import 'package:medinfo/widgets/globais.dart';
-import '../services/auth.dart';
 
 import '/views/cadastro.dart';
 
@@ -18,9 +18,7 @@ class _LoginScreenState extends ConsumerState<LoginView> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _senhaController = TextEditingController();
-  final _authService = AuthService();
   bool _obscurePassword = true;
-  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -30,48 +28,46 @@ class _LoginScreenState extends ConsumerState<LoginView> {
   }
 
   Future<void> _handleLogin() async {
-    if (_formKey.currentState?.validate() ?? false) {
-      setState(() {
-        _isLoading = true;
-      });
+    if (!(_formKey.currentState?.validate() ?? false)) return;
 
-      try {
-        await _authService.login(
+    await ref.read(usuarioViewModelProvider.notifier).login(
           email: _emailController.text.trim(),
-          password: _senhaController.text,
+          senha: _senhaController.text,
         );
+  }
 
-        // Login bem-sucedido - navegar para a tela principal
-        if (mounted) {
-          ref.read(navigationViewModelProvider.notifier).changeViewReplacing(HomeView(), context);
-        }
-
-      } catch (e) {
-        // Mostrar erro ao usuário
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(e.toString()),
-              backgroundColor: Colors.red[400],
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
-          );
-        }
-      } finally {
-        if (mounted) {
-          setState(() {
-            _isLoading = false;
-          });
-        }
-      }
-    }
+  void _mostrarSnack(String mensagem, Color backgroundColor) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(mensagem),
+        backgroundColor: backgroundColor,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    ref.listen<UsuarioViewModelState>(usuarioViewModelProvider, (previous, next) {
+      if (next.ultimaAcao != UsuarioAcao.login || !mounted) {
+        return;
+      }
+
+      if (next.mensagemErro != null) {
+        _mostrarSnack(next.mensagemErro!, Colors.red.shade400);
+      } else if (next.usuario != null) {
+        ref.read(navigationViewModelProvider.notifier).changeViewReplacing(HomeView(), context);
+      }
+
+      ref.read(usuarioViewModelProvider.notifier).limparFeedback();
+    });
+
+    final usuarioState = ref.watch(usuarioViewModelProvider);
+    final bool estaCarregando = usuarioState.estaCarregando;
+
     return AppContentWrapper(
       child: Scaffold(
         backgroundColor: Colors.transparent,
@@ -274,7 +270,7 @@ class _LoginScreenState extends ConsumerState<LoginView> {
 
                           // Botão de Login
                           ElevatedButton(
-                            onPressed: _isLoading ? null : _handleLogin,
+                            onPressed: estaCarregando ? null : _handleLogin,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFF023542),
                               foregroundColor: Colors.white,
@@ -284,22 +280,22 @@ class _LoginScreenState extends ConsumerState<LoginView> {
                               ),
                               elevation: 3,
                             ),
-                            child: _isLoading
+                            child: estaCarregando
                                 ? const SizedBox(
-                              height: 20,
-                              width: 20,
-                              child: CircularProgressIndicator(
-                                color: Colors.white,
-                                strokeWidth: 2,
-                              ),
-                            )
+                                    height: 20,
+                                    width: 20,
+                                    child: CircularProgressIndicator(
+                                      color: Colors.white,
+                                      strokeWidth: 2,
+                                    ),
+                                  )
                                 : const Text(
-                              'Entrar',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
+                                    'Entrar',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
                           ),
 
                           const SizedBox(height: 20),

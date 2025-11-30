@@ -1,14 +1,45 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:medinfo/view_models/usuario.dart';
 import 'package:medinfo/widgets/globais.dart';
 
-import '../services/auth.dart';
 import 'login.dart';
 
-class AjustesView extends StatelessWidget {
+class AjustesView extends ConsumerWidget {
   const AjustesView({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    ref.listen<UsuarioViewModelState>(usuarioViewModelProvider, (previous, next) {
+      if (next.ultimaAcao != UsuarioAcao.logout) {
+        return;
+      }
+
+      if (!context.mounted) {
+        return;
+      }
+
+      if (next.mensagemErro != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Erro ao fazer logout: ${next.mensagemErro}'),
+            backgroundColor: Colors.red.shade400,
+          ),
+        );
+      } else {
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(
+            builder: (ctx) => const LoginView(),
+          ),
+          (route) => false,
+        );
+      }
+
+      ref.read(usuarioViewModelProvider.notifier).limparFeedback();
+    });
+
+    final usuarioState = ref.watch(usuarioViewModelProvider);
+
     return Column(
       children: [
         // AppBar customizada
@@ -76,38 +107,23 @@ class AjustesView extends StatelessWidget {
 
                 // Botão de logout
                 ElevatedButton.icon(
-                  onPressed: () async {
-                    // Importar o serviço de auth
-                    final authService = AuthService();
-
-                    try {
-                      await authService.logout();
-
-                      // Navegar para a tela de login
-                      if (context.mounted) {
-                        Navigator.of(context).pushAndRemoveUntil(
-                          MaterialPageRoute(
-                            builder: (context) => const LoginView(),
-                          ),
-                              (route) => false,
-                        );
-                      }
-                    } catch (e) {
-                      if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('Erro ao fazer logout: $e'),
-                            backgroundColor: Colors.red[400],
-                          ),
-                        );
-                      }
-                    }
-                  },
+                  onPressed: usuarioState.estaCarregando
+                      ? null
+                      : () => ref.read(usuarioViewModelProvider.notifier).logout(),
                   icon: const Icon(Icons.logout),
-                  label: const Text(
-                    'Sair',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
+                  label: usuarioState.estaCarregando
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ),
+                        )
+                      : const Text(
+                          'Sair',
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.red[400],
                     foregroundColor: Colors.white,

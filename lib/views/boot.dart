@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:medinfo/services/auth.dart';
 import 'package:medinfo/view_models/navigation.dart';
+import 'package:medinfo/views/home.dart';
 import 'package:medinfo/views/login.dart';
 
 import '/view_models/categorias.dart';
@@ -26,10 +28,13 @@ class _BootViewState extends ConsumerState<BootView> {
   Widget build(BuildContext context) {
     final state = ref.watch(categoriasViewModelProvider);
 
-    ref.listen<CategoriasViewModelState>(categoriasViewModelProvider,
-          (previous, next) {
+    ref.listen<CategoriasViewModelState>(
+      categoriasViewModelProvider,
+      (previous, next) {
         if (!next.estaCarregando && next.erro == null) {
-          ref.read(navigationViewModelProvider.notifier).changeViewReplacing(LoginView(), context);
+          final authService = AuthService();
+          final targetView = authService.isAuthenticated ? const HomeView() : const LoginView();
+          ref.read(navigationViewModelProvider.notifier).changeViewReplacing(targetView, context);
         }
       },
     );
