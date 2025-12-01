@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:medinfo/view_models/bookmarks.dart';
+import 'package:medinfo/view_models/usuario.dart';
 import '../widgets/globais.dart';
 import '../models/medicamento.dart';
+
+final _buttonLoadingProvider = StateProvider.autoDispose<bool>((ref) => false);
 
 class MedicamentoView extends ConsumerWidget {
   final Medicamento medicamento;
@@ -10,6 +14,43 @@ class MedicamentoView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+
+    final isButtonLoading = ref.watch(_buttonLoadingProvider);
+
+    final isSaved = ref.watch(bookmarksViewModelProvider.notifier).isSalvo(medicamento);
+    
+    final usuarioState = ref.watch(usuarioViewModelProvider);
+
+    Color buttonColor = isSaved ? const Color(0xFFC62828) : Colors.green;
+    IconData buttonIcon = isSaved ? Icons.bookmark_remove : Icons.bookmark;
+    String buttonText = isSaved ? "Remover favorito" : "Salvar medicamento";
+
+    void toggleFavorite() async {
+      if (!usuarioState.estaAutenticado) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Faça login para salvar medicamentos."),
+            backgroundColor: Color(0xFFC62828),
+            duration: Duration(seconds: 2),
+          ),
+        );
+        return;
+      }
+      
+      ref.read(_buttonLoadingProvider.notifier).state = true;
+      
+      try {
+        final notifier = ref.read(bookmarksViewModelProvider.notifier);
+        if (isSaved) {
+          await notifier.removerFavorito(medicamento);
+        } else {
+          await notifier.adicionarFavorito(medicamento);
+        }
+      } finally {
+        ref.read(_buttonLoadingProvider.notifier).state = false;
+      }
+    }
+
     return AppScaffold(
       mainContent: [
         const SizedBox(height: 10),
@@ -40,7 +81,7 @@ class MedicamentoView extends ConsumerWidget {
 
         const SizedBox(height: 25),
 
-        _buildAccordion(),
+        _buildAccordion(medicamento),
         const SizedBox(height: 25),
 
         Padding(
@@ -50,29 +91,39 @@ class MedicamentoView extends ConsumerWidget {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
+                  onPressed: isButtonLoading ? null : toggleFavorite,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green, // VERDE
+                    backgroundColor: buttonColor,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),
                     ),
+                    disabledBackgroundColor: buttonColor.withOpacity(0.5), 
                   ),
-                  onPressed: () {},
-                  child: const Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.bookmark, color: Colors.white, size: 24), // ÍCONE CERTO
-                      SizedBox(width: 10),
-                      Text(
-                        "Salvar medicamento",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
+                  child: isButtonLoading
+                      ? const SizedBox(
+                          height: 24,
+                          width: 24,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 3,
+                          ),
+                        )
+                      : Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(buttonIcon, color: Colors.white, size: 24),
+                            const SizedBox(width: 10),
+                            Text(
+                              buttonText,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                    ],
-                  ),
                 ),
               ),
 
@@ -84,7 +135,7 @@ class MedicamentoView extends ConsumerWidget {
     );
   }
 
-  Widget _buildAccordion() {
+  Widget _buildAccordion(Medicamento medicamento) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
