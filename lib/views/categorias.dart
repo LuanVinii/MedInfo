@@ -53,7 +53,7 @@ class CategoriasView extends ConsumerWidget {
           padding: const EdgeInsets.symmetric(vertical: 20),
           color: _primaryColor,
           child: const Text(
-            "Categoria",
+            "Categorias",
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 24,
@@ -63,22 +63,95 @@ class CategoriasView extends ConsumerWidget {
           ),
         ),
 
-        // CORREÇÃO: Expanded envolvendo a ListView
+        // Conteúdo principal com tratamento de estados
         Expanded(
-          child: ListView.builder(
-            physics: const BouncingScrollPhysics(), // Rolagem mais suave
-            padding: const EdgeInsets.only(top: 16, bottom: 16),
-            itemCount: state.categorias.length,
-            itemBuilder: (context, index) {
-              final categoria = state.categorias[index];
-              return CategoryCard(
-                categoria: categoria,
-                iconData: _getRandomIconData(categoria.icone),
-              );
-            },
-          ),
+          child: _buildContent(state, ref),
         ),
       ],
+    );
+  }
+
+  Widget _buildContent(CategoriasViewModelState state, WidgetRef ref) {
+    // Estado de carregamento
+    if (state.estaCarregando) {
+      return const Center(
+        child: CircularProgressIndicator(
+          color: _primaryColor,
+        ),
+      );
+    }
+
+    // Estado de erro
+    if (state.erro != null) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.error_outline,
+              size: 64,
+              color: Colors.red.shade400,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              state.erro!.mensagem,
+              style: const TextStyle(
+                fontSize: 16,
+                color: Colors.black54,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton.icon(
+              onPressed: () => ref.read(categoriasViewModelProvider.notifier).obterTodas(),
+              icon: const Icon(Icons.refresh),
+              label: const Text('Tentar novamente'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: _primaryColor,
+                foregroundColor: Colors.white,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    // Lista vazia
+    if (state.categorias.isEmpty) {
+      return const Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.category_outlined,
+              size: 64,
+              color: Colors.grey,
+            ),
+            SizedBox(height: 16),
+            Text(
+              'Nenhuma categoria encontrada',
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.black54,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    // Lista de categorias
+    return ListView.builder(
+      physics: const BouncingScrollPhysics(),
+      padding: const EdgeInsets.only(top: 16, bottom: 16),
+      itemCount: state.categorias.length,
+      itemBuilder: (context, index) {
+        final categoria = state.categorias[index];
+        return CategoryCard(
+          categoria: categoria,
+          iconData: _getRandomIconData(categoria.icone),
+        );
+      },
     );
   }
 }

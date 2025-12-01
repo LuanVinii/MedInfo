@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:medinfo/view_models/navigation.dart';
 import 'package:medinfo/view_models/usuario.dart';
+import 'package:medinfo/views/perfil.dart';
 import 'package:medinfo/widgets/globais.dart';
 
 import 'login.dart';
@@ -66,36 +68,64 @@ class AjustesView extends ConsumerWidget {
               const SizedBox(height: 20),
 
               // Card de perfil
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: const [
-                    BoxShadow(
-                      color: Colors.black12,
-                      blurRadius: 10,
-                      offset: Offset(0, 5),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  children: [
-                    const Icon(
-                      Icons.account_circle,
-                      size: 80,
-                      color: Color(0xFF023542),
-                    ),
-                    const SizedBox(height: 15),
-                    const Text(
-                      'Configurações',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
+              GestureDetector(
+                onTap: () {
+                  ref.read(navigationViewModelProvider.notifier).changeView(
+                    const PerfilView(),
+                    context,
+                  );
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Colors.black12,
+                        blurRadius: 10,
+                        offset: Offset(0, 5),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(
+                        Icons.account_circle,
+                        size: 50,
                         color: Color(0xFF023542),
                       ),
-                    ),
-                  ],
+                      const SizedBox(width: 15),
+                      const Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Meu Perfil',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF023542),
+                              ),
+                            ),
+                            SizedBox(height: 4),
+                            Text(
+                              'Editar informações da conta',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.black54,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const Icon(
+                        Icons.arrow_forward_ios,
+                        size: 20,
+                        color: Color(0xFF023542),
+                      ),
+                    ],
+                  ),
                 ),
               ),
 

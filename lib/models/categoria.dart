@@ -12,10 +12,14 @@ class Categoria {
   });
 
   factory Categoria.fromJson(Map<String, dynamic> json) {
+    // Converte id para int caso venha como String (comum em alguns bancos)
+    final rawId = json['id'];
+    final int id = rawId is int ? rawId : int.parse(rawId.toString());
+    
     return Categoria(
-      id: json['id'],
-      nome: json['name'],
-      descricao: json['description'],
+      id: id,
+      nome: json['name'] ?? '',
+      descricao: json['description'] ?? '',
       icone: ''
     );
   }

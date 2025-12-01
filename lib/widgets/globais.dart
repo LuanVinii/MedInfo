@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '/view_models/navigation.dart';
+import '/views/perfil.dart';
 
 class AppContentWrapper extends StatelessWidget {
   final double backgroundOpacity;
@@ -33,16 +34,16 @@ class AppContentWrapper extends StatelessWidget {
   }
 }
 
-class UserAppBar extends StatelessWidget {
+class UserAppBar extends ConsumerWidget {
   const UserAppBar({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 45),
         child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [_menuLateral(), _logo(), _avatar()]
+            children: [_menuLateral(), _logo(), _avatar(context, ref)]
         )
     );
   }
@@ -58,9 +59,14 @@ class UserAppBar extends StatelessWidget {
     return Image.asset('assets/images/logo.png', height: 60);
   }
 
-  Widget _avatar() {
+  Widget _avatar(BuildContext context, WidgetRef ref) {
     return IconButton(
-      onPressed: () {},
+      onPressed: () {
+        ref.read(navigationViewModelProvider.notifier).changeView(
+          const PerfilView(),
+          context,
+        );
+      },
       icon: const Icon(Icons.account_circle, color: Color(0xFF023542), size: 35),
     );
   }

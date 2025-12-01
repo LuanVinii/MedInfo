@@ -7,6 +7,7 @@ enum UsuarioAcao {
   login,
   cadastro,
   logout,
+  atualizarPerfil,
 }
 
 class UsuarioViewModel extends StateNotifier<UsuarioViewModelState> {
@@ -96,6 +97,37 @@ class UsuarioViewModel extends StateNotifier<UsuarioViewModelState> {
         estaCarregando: false,
         mensagemErro: _sanitizeError(error),
         ultimaAcao: UsuarioAcao.logout,
+      );
+    }
+  }
+
+  Future<void> atualizarPerfil({
+    required String nome,
+    required String email,
+    String? novaSenha,
+  }) async {
+    state = UsuarioViewModelState(
+      usuario: state.usuario,
+      estaCarregando: true,
+    );
+
+    try {
+      final usuario = await _authService.atualizarPerfil(
+        nome: nome,
+        email: email,
+        novaSenha: novaSenha,
+      );
+      state = UsuarioViewModelState(
+        usuario: usuario,
+        estaCarregando: false,
+        ultimaAcao: UsuarioAcao.atualizarPerfil,
+      );
+    } catch (error) {
+      state = UsuarioViewModelState(
+        usuario: state.usuario,
+        estaCarregando: false,
+        mensagemErro: _sanitizeError(error),
+        ultimaAcao: UsuarioAcao.atualizarPerfil,
       );
     }
   }
