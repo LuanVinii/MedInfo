@@ -40,12 +40,14 @@ class MedicamentoView extends ConsumerWidget {
       ref.read(_buttonLoadingProvider.notifier).state = true;
       
       try {
-        final notifier = ref.read(bookmarksViewModelProvider.notifier);
+        final usuarioNotifier = ref.read(usuarioViewModelProvider.notifier);
         if (isSaved) {
-          await notifier.removerFavorito(medicamento);
+          await usuarioNotifier.desfavoritarMedicamento(medicamento);
         } else {
-          await notifier.adicionarFavorito(medicamento);
+          await usuarioNotifier.favoritarMedicamento(medicamento);
         }
+        // Atualiza a lista de bookmarks para manter sincronizado
+        await ref.read(bookmarksViewModelProvider.notifier).obterMedicamentosSalvos();
       } finally {
         ref.read(_buttonLoadingProvider.notifier).state = false;
       }

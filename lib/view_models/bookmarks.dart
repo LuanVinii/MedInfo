@@ -1,6 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medinfo/models/medicamento.dart';
-import 'package:medinfo/models/usuario.dart';
 import 'package:medinfo/repositories/medicamento.dart';
 import 'package:medinfo/view_models/usuario.dart';
 
@@ -68,6 +67,10 @@ class BookmarksViewModel extends StateNotifier<BookmarksViewModelState> {
   
   bool isSalvo(Medicamento medicamento) {
     return state.medicamentosSalvos.any((m) => m.id == medicamento.id);
+  }
+
+  void limparDados() {
+    state = BookmarksViewModelState(medicamentosSalvos: const []);
   }
 }
 

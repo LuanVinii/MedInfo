@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:medinfo/view_models/bookmarks.dart';
 import 'package:medinfo/view_models/navigation.dart';
 import 'package:medinfo/view_models/usuario.dart';
 import 'package:medinfo/views/perfil.dart';
@@ -29,6 +30,9 @@ class AjustesView extends ConsumerWidget {
           ),
         );
       } else {
+        // Limpa os dados de bookmarks do usuário anterior
+        ref.read(bookmarksViewModelProvider.notifier).limparDados();
+        
         Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(
             builder: (ctx) => const LoginView(),
