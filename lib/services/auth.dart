@@ -109,6 +109,62 @@ class AuthService {
     );
   }
 
+  Future<Usuario> atualizarPerfil({
+    required String nome,
+    required String email,
+    String? novaSenha,
+  }) async {
+    if (_currentUser == null) {
+      throw Exception('Usuário não autenticado');
+    }
+
+    try {
+      // Verifica se o novo email já está em uso (por outro usuário)
+      if (email != _currentUser!.email) {
+        final existing = await _supabase
+            .from('users')
+            .select('id')
+            .eq('email', email)
+            .neq('id', _currentUser!.id)
+            .maybeSingle();
+
+        if (existing != null) {
+          throw Exception('Este email já está em uso por outra conta');
+        }
+      }
+
+      // Monta os dados para atualização
+      final Map<String, dynamic> updateData = {
+        'name': nome,
+        'email': email,
+      };
+
+      // Se uma nova senha foi fornecida, inclui na atualização
+      if (novaSenha != null && novaSenha.isNotEmpty) {
+        updateData['password'] = novaSenha;
+      }
+
+      // Atualiza o usuário no banco
+      final updated = await _supabase
+          .from('users')
+          .update(updateData)
+          .eq('id', _currentUser!.id)
+          .select()
+          .single();
+
+      _currentUser = Usuario.fromJson(Map<String, dynamic>.from(updated));
+      await _persistUser(_currentUser!);
+      return _currentUser!;
+    } on PostgrestException catch (e) {
+      throw Exception('Erro ao atualizar perfil: ${e.message}');
+    } catch (e) {
+      if (e.toString().startsWith('Exception:')) {
+        rethrow;
+      }
+      throw Exception('Erro ao atualizar perfil: $e');
+    }
+  }
+
   Future<void> _persistUser(Usuario usuario) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(

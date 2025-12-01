@@ -35,7 +35,11 @@ class MedicamentoRepository {
   }
 
   Future<List<Medicamento>> obterPorUsuario(Usuario usuario) async {
-    return await service.obterPorUsuario(usuario);
+    var registros = await _supabase.from('user_medicine')
+        .select('medicine_id, medicines(id,name,average_price,categories(*),formats(*),admroutes(*),labelclasses(*),laboratories(*))')
+        .eq('user_id', usuario.id);
+        
+    return registros.map((objeto) => Medicamento.fromJson(objeto['medicines'])).toList();
   }
 
   Future<List<Medicamento>> buscarPorTermoNaCategoria(String termo, Categoria categoria) async {
