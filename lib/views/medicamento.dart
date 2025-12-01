@@ -17,8 +17,10 @@ class MedicamentoView extends ConsumerWidget {
 
     final isButtonLoading = ref.watch(_buttonLoadingProvider);
 
-    final isSaved = ref.watch(bookmarksViewModelProvider.notifier).isSalvo(medicamento);
+    final bookmarksState = ref.watch(bookmarksViewModelProvider);
+    final isSaved = bookmarksState.medicamentosSalvos.any((m) => m.id == medicamento.id);
     
+    final usuarioNotifier = ref.read(usuarioViewModelProvider.notifier);
     final usuarioState = ref.watch(usuarioViewModelProvider);
 
     Color buttonColor = isSaved ? const Color(0xFFC62828) : Colors.green;
@@ -40,12 +42,14 @@ class MedicamentoView extends ConsumerWidget {
       ref.read(_buttonLoadingProvider.notifier).state = true;
       
       try {
-        final notifier = ref.read(bookmarksViewModelProvider.notifier);
         if (isSaved) {
-          await notifier.removerFavorito(medicamento);
+          await usuarioNotifier.desfavoritarMedicamento(medicamento);
         } else {
-          await notifier.adicionarFavorito(medicamento);
+          await usuarioNotifier.favoritarMedicamento(medicamento);
         }
+
+        ref.read(bookmarksViewModelProvider.notifier).obterMedicamentosSalvos();
+
       } finally {
         ref.read(_buttonLoadingProvider.notifier).state = false;
       }
