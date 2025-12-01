@@ -34,13 +34,18 @@ class BookmarksViewModel extends StateNotifier<BookmarksViewModelState> {
 
   BookmarksViewModel(this._ref, {MedicamentoRepository? repository}) 
       : _repository = repository ?? MedicamentoRepository(),
-        super(BookmarksViewModelState());
+        super(BookmarksViewModelState()) {
+
+        _ref.listen<UsuarioViewModelState>(usuarioViewModelProvider, (_, newState) {
+            obterMedicamentosSalvos();
+        }, fireImmediately: true);
+    }
 
   Future<void> obterMedicamentosSalvos() async {
     final usuarioState = _ref.read(usuarioViewModelProvider);
 
     if (!usuarioState.estaAutenticado) {
-      state = BookmarksViewModelState(medicamentosSalvos: const []);
+      state = BookmarksViewModelState(medicamentosSalvos: const [], estaCarregando: false, mensagemErro: null);
       return;
     }
 
@@ -60,52 +65,7 @@ class BookmarksViewModel extends StateNotifier<BookmarksViewModelState> {
       );
     }
   }
-
-  Future<void> removerFavorito(Medicamento medicamento) async {
-    final usuarioState = _ref.read(usuarioViewModelProvider);
-
-    if (!usuarioState.estaAutenticado) {
-      state = state.copyWith(mensagemErro: "Você precisa estar logado para remover favoritos.");
-      return;
-    }
-    
-    final userId = usuarioState.usuario!.id;
-
-    final updatedList = state.medicamentosSalvos
-        .where((m) => m.id != medicamento.id)
-        .toList();
-    state = state.copyWith(medicamentosSalvos: updatedList);
-    
-    try {
-        await _repository.removerFavorito(userId, medicamento);
-    } catch (e) {
-        state = state.copyWith(mensagemErro: "Erro ao remover favorito. Tentando restaurar a lista.");
-        obterMedicamentosSalvos(); 
-    }
-  } 
-
-  Future<void> adicionarFavorito(Medicamento medicamento) async {
-    final usuarioState = _ref.read(usuarioViewModelProvider);
-
-    if (!usuarioState.estaAutenticado) {
-      state = state.copyWith(mensagemErro: "Você precisa estar logado para adicionar favoritos.");
-      return;
-    }
-
-    if (!state.medicamentosSalvos.any((m) => m.id == medicamento.id)) {
-      final userId = usuarioState.usuario!.id;
-      final updatedList = [...state.medicamentosSalvos, medicamento];
-      state = state.copyWith(medicamentosSalvos: updatedList);
-
-      try {
-        await _repository.salvarFavorito(userId, medicamento);
-      } catch (e) {
-        state = state.copyWith(mensagemErro: "Erro ao salvar favorito. Tentando restaurar a lista.");
-        obterMedicamentosSalvos();
-      }
-    }
-  }
-
+  
   bool isSalvo(Medicamento medicamento) {
     return state.medicamentosSalvos.any((m) => m.id == medicamento.id);
   }

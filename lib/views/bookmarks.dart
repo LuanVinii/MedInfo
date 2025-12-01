@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medinfo/models/medicamento.dart';
 import 'package:medinfo/view_models/bookmarks.dart';
 import 'package:medinfo/view_models/navigation.dart';
+import 'package:medinfo/view_models/usuario.dart';
 import 'package:medinfo/views/medicamento.dart';
 
 import '../widgets/globais.dart';
@@ -17,7 +18,7 @@ class BookmarksView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(bookmarksViewModelProvider);
 
-    if (state.medicamentosSalvos.isEmpty) {
+    if (state.medicamentosSalvos.isEmpty && !state.estaCarregando) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
             ref.read(bookmarksViewModelProvider.notifier).obterMedicamentosSalvos();
         });
@@ -31,7 +32,7 @@ class BookmarksView extends ConsumerWidget {
           padding: const EdgeInsets.symmetric(vertical: 20),
           color: _primaryColor,
           child: const Text(
-            "Salvos", // Título da tela
+            "Salvos", 
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 24,
@@ -42,29 +43,31 @@ class BookmarksView extends ConsumerWidget {
         ),
 
         Expanded(
-          child: state.medicamentosSalvos.isEmpty
-              ? const Center(
-                  child: Padding(
-                    padding: EdgeInsets.all(20.0),
-                    child: Text(
-                      "Nenhum medicamento salvo.",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 16, color: Colors.black54),
+          child: state.estaCarregando
+                ? const Center(child: CircularProgressIndicator(color: _primaryColor))
+                : state.medicamentosSalvos.isEmpty
+                ? const Center(
+                    child: Padding(
+                      padding: EdgeInsets.all(20.0),
+                      child: Text(
+                        "Nenhum medicamento salvo.",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 16, color: Colors.black54),
+                      ),
                     ),
+                  )
+                : ListView.builder(
+                    physics: const BouncingScrollPhysics(),
+                    padding: const EdgeInsets.only(top: 16, bottom: 16),
+                    itemCount: state.medicamentosSalvos.length,
+                    itemBuilder: (context, index) {
+                      final medicamento = state.medicamentosSalvos[index];
+                      return _MedicamentoCard(
+                        medicamento: medicamento,
+                        key: ValueKey(medicamento.id),
+                      );
+                    },
                   ),
-                )
-              : ListView.builder(
-                  physics: const BouncingScrollPhysics(),
-                  padding: const EdgeInsets.only(top: 16, bottom: 16),
-                  itemCount: state.medicamentosSalvos.length,
-                  itemBuilder: (context, index) {
-                    final medicamento = state.medicamentosSalvos[index];
-                    return _MedicamentoCard(
-                      medicamento: medicamento,
-                      key: ValueKey(medicamento.id),
-                    );
-                  },
-                ),
         ),
       ],
     );
@@ -95,7 +98,10 @@ class _MedicamentoCardState extends ConsumerState<_MedicamentoCard> {
 
     await Future.delayed(const Duration(milliseconds: 250));
 
-    ref.read(bookmarksViewModelProvider.notifier).removerFavorito(widget.medicamento);
+    final usuarioNotifier = ref.read(usuarioViewModelProvider.notifier);
+    await usuarioNotifier.desfavoritarMedicamento(widget.medicamento);
+
+    ref.read(bookmarksViewModelProvider.notifier).obterMedicamentosSalvos();
   }
 
   @override
