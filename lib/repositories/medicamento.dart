@@ -1,3 +1,4 @@
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '/models/categoria.dart';
 import '/models/medicamento.dart';
 import '/models/usuario.dart';
@@ -5,6 +6,7 @@ import '/services/medicamento.dart';
 
 class MedicamentoRepository {
   final MedicamentoService service;
+  final SupabaseClient _supabase = Supabase.instance.client;
 
   MedicamentoRepository({MedicamentoService? service}) : service = service ?? MedicamentoService();
 
@@ -41,4 +43,27 @@ class MedicamentoRepository {
     return medicamentos.where((medicamento) => medicamento.categoria.id == categoria.id).toList();
   }
 
+  Future<void> salvarFavorito(Medicamento medicamento) async {
+    final userId = _supabase.auth.currentUser?.id;
+    if (userId == null) {
+        throw Exception("Usuário não autenticado.");
+    }
+     
+    await _supabase.from('user_medicine').insert({
+      'user_id': userId,
+      'medicine_id': medicamento.id,
+    });
+  }
+  
+  Future<void> removerFavorito(Medicamento medicamento) async {
+    final userId = _supabase.auth.currentUser?.id;
+    if (userId == null) {
+        throw Exception("Usuário não autenticado.");
+    }
+     
+    await _supabase.from('user_medicine').delete().match({
+      'user_id': userId,
+      'medicine_id': medicamento.id,
+    });
+  }
 }
