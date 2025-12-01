@@ -43,24 +43,22 @@ class MedicamentoRepository {
     return medicamentos.where((medicamento) => medicamento.categoria.id == categoria.id).toList();
   }
 
-  Future<void> salvarFavorito(Medicamento medicamento) async {
-    final userId = _supabase.auth.currentUser?.id;
+  Future<void> salvarFavorito(int userId, Medicamento medicamento) async {
     if (userId == null) {
-        throw Exception("Usuário não autenticado.");
+        throw Exception("ID de Usuário inválido.");
     }
-     
+      
     await _supabase.from('user_medicine').insert({
       'user_id': userId,
       'medicine_id': medicamento.id,
     });
   }
   
-  Future<void> removerFavorito(Medicamento medicamento) async {
-    final userId = _supabase.auth.currentUser?.id;
+  Future<void> removerFavorito(int userId, Medicamento medicamento) async {
     if (userId == null) {
-        throw Exception("Usuário não autenticado.");
+        throw Exception("ID de Usuário inválido.");
     }
-     
+      
     await _supabase.from('user_medicine').delete().match({
       'user_id': userId,
       'medicine_id': medicamento.id,

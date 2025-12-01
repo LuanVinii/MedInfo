@@ -68,6 +68,8 @@ class BookmarksViewModel extends StateNotifier<BookmarksViewModelState> {
       state = state.copyWith(mensagemErro: "Você precisa estar logado para remover favoritos.");
       return;
     }
+    
+    final userId = usuarioState.usuario!.id;
 
     final updatedList = state.medicamentosSalvos
         .where((m) => m.id != medicamento.id)
@@ -75,7 +77,7 @@ class BookmarksViewModel extends StateNotifier<BookmarksViewModelState> {
     state = state.copyWith(medicamentosSalvos: updatedList);
     
     try {
-        await _repository.removerFavorito(medicamento);
+        await _repository.removerFavorito(userId, medicamento);
     } catch (e) {
         state = state.copyWith(mensagemErro: "Erro ao remover favorito. Tentando restaurar a lista.");
         obterMedicamentosSalvos(); 
@@ -91,11 +93,12 @@ class BookmarksViewModel extends StateNotifier<BookmarksViewModelState> {
     }
 
     if (!state.medicamentosSalvos.any((m) => m.id == medicamento.id)) {
+      final userId = usuarioState.usuario!.id;
       final updatedList = [...state.medicamentosSalvos, medicamento];
       state = state.copyWith(medicamentosSalvos: updatedList);
 
       try {
-        await _repository.salvarFavorito(medicamento);
+        await _repository.salvarFavorito(userId, medicamento);
       } catch (e) {
         state = state.copyWith(mensagemErro: "Erro ao salvar favorito. Tentando restaurar a lista.");
         obterMedicamentosSalvos();
